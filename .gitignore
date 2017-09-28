@@ -1,3 +1,14 @@
+__saves__
+Debug
+x64
+.vs
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj.user
+/.build*
+/.output*
+
 # Prerequisites
 *.d
 

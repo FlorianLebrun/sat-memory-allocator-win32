@@ -1,0 +1,6 @@
+
+namespace ZonedPageAllocator {
+  struct GlobalHeap {
+
+  };
+}
