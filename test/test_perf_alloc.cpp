@@ -185,6 +185,7 @@ struct tTest {
 
 
 void test_perf_alloc() {
+  printf("------------------ Test perf alloc ------------------\n");
   tTest test;
 
 #ifdef USE_TCMALLOC

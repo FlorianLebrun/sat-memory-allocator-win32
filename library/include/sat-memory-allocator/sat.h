@@ -53,26 +53,39 @@ namespace SAT {
     virtual bool visit(tpObjectInfos obj) = 0;
   };
 
+  struct IObjectAllocator {
+    typedef void* (IObjectAllocator::*f_malloc)(uint64_t meta);
+
+    virtual size_t getMaxAllocatedSize() = 0;
+    virtual size_t getMinAllocatedSize() = 0;
+    virtual size_t getAllocatedSize(size_t size) = 0;
+    virtual void* allocate(size_t size) = 0;
+
+    virtual size_t getMaxAllocatedSizeWithMeta() = 0;
+    virtual size_t getMinAllocatedSizeWithMeta() = 0;
+    virtual size_t getAllocatedSizeWithMeta(size_t size) = 0;
+    virtual void* allocateWithMeta(size_t size, uint64_t meta) = 0;
+  };
+
   struct IThread : IReleasable {
 
     // Basic infos
     virtual uint64_t getID() = 0;
     virtual const char* getName() = 0;
     virtual bool setName(const char*) = 0;
-    
+
     // Stack Analysis
     virtual uint64_t getStackStamp() = 0;
     virtual void setStackAnalyzer(IStackStampAnalyzer* stack_analyzer) = 0;
   };
 
-  struct IHeap : IReleasable {
+  struct IHeap : IReleasable, IObjectAllocator {
 
     // Basic infos
     virtual int getID() = 0;
     virtual const char* getName() = 0;
 
     // Allocation
-    virtual void* allocBuffer(size_t size, SAT::tObjectMetaData meta) = 0;
     virtual uintptr_t acquirePages(size_t size) = 0;
     virtual void releasePages(uintptr_t index, size_t size) = 0;
   };

@@ -36,11 +36,35 @@ struct TypesDataHeap : SATBasicRealeasable<IHeap> {
   virtual const char* getName() override {
     return "Types database heap";
   }
-
-  virtual void* allocBuffer(size_t size, SAT::tObjectMetaData meta) override {
+  virtual size_t getMaxAllocatedSize() override {
+    return this->reserved << SAT::cSegmentSizeL2;
+  }
+  virtual size_t getMinAllocatedSize() override {
+    return 0;
+  }
+  virtual size_t getAllocatedSize(size_t size) override {
+    return size;
+  }
+  virtual size_t getMaxAllocatedSizeWithMeta() override {
+    return this->getMaxAllocatedSize();
+  }
+  virtual size_t getMinAllocatedSizeWithMeta() override {
+    return this->getMinAllocatedSize();
+  }
+  virtual size_t getAllocatedSizeWithMeta(size_t size) override {
+    return this->getAllocatedSize(size);
+  }
+  virtual void* allocate(size_t size) override {
     this->heaplock.lock();
-    IObjectAllocator* allocator = g_typesDataheap.l_typesLocal.getSizeAllocator(size);
-    void* ptr = allocator->allocObject(size, meta.bits);
+    SAT::IObjectAllocator* allocator = g_typesDataheap.l_typesLocal.getSizeAllocator(size);
+    void* ptr = allocator->allocate(size);
+    this->heaplock.unlock();
+    return ptr;
+  }
+  virtual void* allocateWithMeta(size_t size, uint64_t meta) override {
+    this->heaplock.lock();
+    SAT::IObjectAllocator* allocator = g_typesDataheap.l_typesLocal.getSizeAllocator(size);
+    void* ptr = allocator->allocateWithMeta(size, meta);
     this->heaplock.unlock();
     return ptr;
   }
@@ -77,7 +101,7 @@ struct TypesDataHeap : SATBasicRealeasable<IHeap> {
 } g_typesDataheap;
 
 static struct TypesDataBase : SAT::ITypesController {
-  
+
   virtual TypeDef getType(TypeDefID typeID) override;
   virtual TypeDefID getTypeID(TypeDef typ) override;
 
@@ -97,7 +121,7 @@ SAT::ITypesController* sat_get_types_controller() {
 }
 
 void* TypesDataBase::alloc(int size) {
-  return g_typesDataheap.allocBuffer(size, 0);
+  return g_typesDataheap.allocate(size);
 }
 
 void TypesDataBase::free(void* ptr) {

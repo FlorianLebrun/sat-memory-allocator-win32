@@ -3,13 +3,14 @@ namespace ZonedBuddyAllocator {
   namespace Global {
 
     template<class TBaseCache, int sizeID, int dividor>
-    struct ZonedObjectCache : public IObjectAllocator {
+    struct ZonedObjectCache : public SAT::IObjectAllocator {
 
       static const int subSizeID = sizeID | (dividor << 2);
       static const int subObjectSize = (((supportSize >> sizeID) - sizeof(tZone)) / dividor)&(-8);
       static const int subObjectPerZone = dividor;
       static const int subObjectPerTryCache = (4 >> (supportLengthL2 - sizeID)) || 1;
       static const int subObjectPerTryScavenge = (4 >> (supportLengthL2 - sizeID)) || 1;
+      static const int allocatedSize = subObjectSize;
 
       SpinLock lock;
       tObjectList<ZoneObject> objects;
@@ -17,14 +18,15 @@ namespace ZonedBuddyAllocator {
 
       ScavengeManifold<Zone> scavenge;
 
-      virtual void* allocObject(size_t, uint64_t meta) override
-      {
-        return 0;
-      }
-      virtual size_t allocatedSize() override
-      {
-        return subObjectSize;
-      }
+      virtual size_t getMaxAllocatedSize() override {return allocatedSize;}
+      virtual size_t getMinAllocatedSize() override {return allocatedSize;}
+      virtual size_t getAllocatedSize(size_t size) override {return allocatedSize;}
+      virtual size_t getMaxAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getMinAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getAllocatedSizeWithMeta(size_t size) override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+
+      virtual void* allocate(size_t) override {return 0;}
+      virtual void* allocateWithMeta(size_t, uint64_t meta) override {return 0;}
 
       void init(TBaseCache* heap)
       {

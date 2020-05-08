@@ -52,7 +52,7 @@ void ZonedBuddyAllocator::Global::Cache::flushCache() {
   this->base_cache_0.flushCache();
 }
 
-IObjectAllocator* ZonedBuddyAllocator::Global::Cache::getAllocator(int id) {
+SAT::IObjectAllocator* ZonedBuddyAllocator::Global::Cache::getAllocator(int id) {
   switch (id) {
   case 0:
   case 1: return &this->base_cache_0;

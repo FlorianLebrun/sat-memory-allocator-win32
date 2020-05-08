@@ -38,20 +38,11 @@ public:
   virtual void destroy() = 0;
 };
 
-struct IObjectAllocator {
-  typedef void* (IObjectAllocator::*f_malloc)(uint64_t meta);
-
-  virtual void* allocObject(size_t size, uint64_t meta) = 0;
-  virtual size_t allocatedSize() = 0;
-};
-
 #include "./controller/index.h"
 
 namespace SAT {
   void TypesDataBase_init();
-  extern __declspec(thread) Thread* thread_instance;
-  extern __declspec(thread) LocalHeap* thread_local_heap;
-  extern __declspec(thread) GlobalHeap* thread_global_heap;
+  extern __declspec(thread) Thread* current_thread;
 }
 
 #endif

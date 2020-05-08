@@ -3,7 +3,7 @@ namespace ZonedBuddyAllocator {
   namespace Local {
 
     template<int sizeID>
-    struct ObjectCache : public IObjectAllocator {
+    struct ObjectCache : public SAT::IObjectAllocator {
       typedef Global::ObjectCache<sizeID> tGlobalCache;
       typedef ObjectCache<(sizeID - 1) & 3> tUpperCache;
 
@@ -11,6 +11,7 @@ namespace ZonedBuddyAllocator {
       static const uintptr_t objectSize = 1 << sizeL2;
       static const uintptr_t objectPtrMask = uint64_t(-1) << sizeL2;
       static const uintptr_t objectOffsetMask = ~objectPtrMask;
+      static const uintptr_t allocatedSize = objectSize - tObject::headerSize;
 
       tObjectList<Object> objects;
       PageObjectCache* heap;
@@ -60,22 +61,43 @@ namespace ZonedBuddyAllocator {
 
         return obj_0;
       }
-      virtual size_t allocatedSize() override {
-        return objectSize - tObject::headerSize;
-      }
-      virtual void* allocObject(size_t, uint64_t meta)
+
+      virtual size_t getMaxAllocatedSize() override {return allocatedSize;}
+      virtual size_t getMinAllocatedSize() override {return allocatedSize;}
+      virtual size_t getAllocatedSize(size_t size) override {return allocatedSize;}
+      virtual size_t getMaxAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getMinAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getAllocatedSizeWithMeta(size_t size) override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+
+      virtual void* allocate(size_t size) override
       {
         // Acquire free object
         const Object obj = this->acquireObject();
         assert(obj->status == STATUS_FREE(sizeID));
+        assert(size <= this->getMaxAllocatedSize());
 
         // Prepare object content
         uint64_t* ptr = obj->content();
-        if(meta) {
-          (ptr++)[0] = meta;// Prepare metadata before declare object as allocated with type
-          obj->tag = cTAG_ALLOCATED_BIT|cTAG_METADATA_BIT;
-        }
-        else obj->tag = cTAG_ALLOCATED_BIT;
+        obj->tag = cTAG_ALLOCATED_BIT;
+        obj->status = STATUS_ALLOCATE(sizeID);
+
+        // Tag the entry for this object
+        const SATEntry entry = g_SATable->get<tSATEntry>(uintptr_t(obj) >> SAT::cSegmentSizeL2);
+        WriteTags<sizeID, sizeID | cTAG_ALLOCATED_BIT>::apply(entry, uintptr_t(obj) >> baseSizeL2);
+
+        return ptr;
+      }
+      virtual void* allocateWithMeta(size_t size, uint64_t meta) override
+      {
+        // Acquire free object
+        const Object obj = this->acquireObject();
+        assert(obj->status == STATUS_FREE(sizeID));
+        assert(size <= this->getMaxAllocatedSizeWithMeta());
+
+        // Prepare object content
+        uint64_t* ptr = obj->content();
+        (ptr++)[0] = meta;// Prepare metadata before declare object as allocated with type
+        obj->tag = cTAG_ALLOCATED_BIT|cTAG_METADATA_BIT;
         obj->status = STATUS_ALLOCATE(sizeID);
 
         // Tag the entry for this object

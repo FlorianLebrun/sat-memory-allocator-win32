@@ -7,18 +7,30 @@ struct Global : SAT::GlobalHeap {
   ZonedBuddyAllocator::Global::Cache zonedBuddy;
 
   Global(const char* name) : SAT::GlobalHeap(name) {
-    this->largeObject.init(this);
+    
+    // Init allocators
     this->zonedBuddy.init(this);
+    this->largeObject.init(this);
+
+    // Register zonedBuddy allocators
     for (int baseID = 0; baseID <= 6; baseID++) {
-      IObjectAllocator* base = this->zonedBuddy.getAllocator(baseID << 4);
+      SAT::IObjectAllocator* base = this->zonedBuddy.getAllocator(baseID << 4);
       this->sizeMapping.registerAllocator(base);
+      this->sizeMappingWithMeta.registerAllocator(base);
       for (int dividor = 8; dividor <= 16; dividor++) {
-        IObjectAllocator* zoned = this->zonedBuddy.getAllocator((baseID << 4) | dividor);
+        SAT::IObjectAllocator* zoned = this->zonedBuddy.getAllocator((baseID << 4) | dividor);
         this->sizeMapping.registerAllocator(zoned);
+        this->sizeMappingWithMeta.registerAllocator(zoned);
       }
     }
+
+    // Register largeObject allocator
     this->sizeMapping.registerAllocator(&this->largeObject);
+    this->sizeMappingWithMeta.registerAllocator(&this->largeObject);
+
+    // Compute size mappings
     this->sizeMapping.finalize();
+    this->sizeMappingWithMeta.finalize();
   }
   virtual size_t free(void* obj) override {
     int size = 0;
@@ -54,17 +66,29 @@ struct Local : SAT::LocalHeap {
 
   Local(Global* global)
     : SAT::LocalHeap(global), largeObject(global->largeObject) {
+      
+    // Init allocators
     this->zonedBuddy.init(&global->zonedBuddy);
+
+    // Register zonedBuddy allocators
     for (int baseID = 0; baseID <= 6; baseID++) {
-      IObjectAllocator* base = this->zonedBuddy.getAllocator(baseID << 4);
+      SAT::IObjectAllocator* base = this->zonedBuddy.getAllocator(baseID << 4);
       this->sizeMapping.registerAllocator(base);
+      this->sizeMappingWithMeta.registerAllocator(base);
       for (int dividor = 8; dividor <= 16; dividor++) {
-        IObjectAllocator* zoned = this->zonedBuddy.getAllocator((baseID << 4) | dividor);
+        SAT::IObjectAllocator* zoned = this->zonedBuddy.getAllocator((baseID << 4) | dividor);
         this->sizeMapping.registerAllocator(zoned);
+        this->sizeMappingWithMeta.registerAllocator(zoned);
       }
     }
+
+    // Register largeObject allocator
     this->sizeMapping.registerAllocator(&this->largeObject);
+    this->sizeMappingWithMeta.registerAllocator(&this->largeObject);
+
+    // Compute size mappings
     this->sizeMapping.finalize();
+    this->sizeMappingWithMeta.finalize();
   }
   virtual size_t free(void* obj) override
   {

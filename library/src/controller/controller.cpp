@@ -320,11 +320,9 @@ void sat_attach_current_thread() {
 }
 
 void sat_dettach_current_thread() {
-  if (SAT::Thread* thread = SAT::thread_instance) {
+  if (SAT::Thread* thread = SAT::current_thread) {
     printf("thread:%lld is dettached.\n", thread->id);
-    SAT::thread_local_heap = 0;
-    SAT::thread_global_heap = 0;
-    SAT::thread_instance = 0;
+    SAT::current_thread = 0;
     thread->release();
   }
 }

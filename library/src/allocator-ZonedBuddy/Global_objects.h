@@ -6,7 +6,7 @@ namespace ZonedBuddyAllocator {
     struct ObjectCache;
 
     template<int sizeID, int upperSizeID>
-    struct BaseCache : public IObjectAllocator
+    struct BaseCache : public SAT::IObjectAllocator
     {
       typedef ObjectCache<upperSizeID> tUpperCache;
 
@@ -16,6 +16,7 @@ namespace ZonedBuddyAllocator {
       static const uintptr_t objectOffsetMask = ~objectPtrMask;
       static const int objectPerTryCache = (4 >> (supportLengthL2 - sizeID)) || 1;
       static const int objectPerTryScavenge = (4 >> (supportLengthL2 - sizeID)) || 1;
+      static const size_t allocatedSize = objectSize;
 
       SpinLock lock;
       PageObjectCache* heap;
@@ -23,14 +24,15 @@ namespace ZonedBuddyAllocator {
       tObjectList<Object> objects;
       ScavengeManifold<ObjectEx> scavenge;
 
-      virtual void* allocObject(size_t, uint64_t meta) override
-      {
-        return 0;
-      }
-      virtual size_t allocatedSize() override
-      {
-        return objectSize;
-      }
+      virtual size_t getMaxAllocatedSize() override {return allocatedSize;}
+      virtual size_t getMinAllocatedSize() override {return allocatedSize;}
+      virtual size_t getAllocatedSize(size_t size) override {return allocatedSize;}
+      virtual size_t getMaxAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getMinAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getAllocatedSizeWithMeta(size_t size) override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+
+      virtual void* allocate(size_t) override {return 0;}
+      virtual void* allocateWithMeta(size_t, uint64_t meta) override {return 0;}
     };
 
     template<int sizeID>

@@ -2,9 +2,7 @@
 #include "./allocator-ZonedBuddy/index.h"
 #include "./allocator-LargeObject/index.h"
 
-__declspec(thread) SAT::Thread* SAT::thread_instance = 0;
-__declspec(thread) SAT::LocalHeap* SAT::thread_local_heap = 0;
-__declspec(thread) SAT::GlobalHeap* SAT::thread_global_heap = 0;
+__declspec(thread) SAT::Thread* SAT::current_thread = 0;
 
 static SAT::tp_malloc _sat_default_malloc = 0;
 static SAT::tp_realloc _sat_default_realloc = 0;
@@ -28,17 +26,16 @@ void _satmalloc_init() {
 }
 
 void sat_flush_cache() {
-  if (SAT::thread_local_heap) {
-    SAT::thread_local_heap->flushCache();
-    SAT::thread_global_heap->flushCache();
+  if (SAT::current_thread) {
+    SAT::current_thread->local_heap->flushCache();
+    SAT::current_thread->global_heap->flushCache();
   }
 }
 
 void* sat_malloc_ex(size_t size, uint64_t meta) {
-  if (!SAT::thread_local_heap) {
-    g_SAT.getCurrentThread();
-  }
-  void* ptr = SAT::thread_local_heap->alloc(size, meta);
+  SAT::Thread* thread = SAT::current_thread;
+  if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
+  void* ptr = thread->local_heap->allocateWithMeta(size, meta);
 #ifdef _DEBUG
   memset(ptr, 0xdd, size);
 #endif
@@ -46,10 +43,9 @@ void* sat_malloc_ex(size_t size, uint64_t meta) {
 }
 
 void* sat_malloc(size_t size) {
-  if (!SAT::thread_local_heap) {
-    g_SAT.getCurrentThread();
-  }
-  void* ptr = SAT::thread_local_heap->alloc(size, 0);
+  SAT::Thread* thread = SAT::current_thread;
+  if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
+  void* ptr = thread->local_heap->allocate(size);
 #ifdef _DEBUG
   memset(ptr, 0xdd, size);
 #endif
@@ -114,8 +110,8 @@ void sat_free(void* ptr, SAT::tp_free default_free) {
   if (index < g_SATable->SATDescriptor.length) {
     SAT::tpHeapSegmentEntry entry = SAT::tpHeapSegmentEntry(&g_SATable[index]);
     if(SAT::tEntryID::isHeapSegment(entry->id)) {
-      if (SAT::thread_local_heap && entry->heapID == SAT::thread_local_heap->id) {
-        size = SAT::thread_local_heap->free(ptr);
+      if (SAT::current_thread && entry->heapID == SAT::current_thread->heapId) {
+        size = SAT::current_thread->local_heap->free(ptr);
       }
       else {
         size = g_SAT.heaps_table[entry->heapID]->free(ptr);
@@ -182,7 +178,8 @@ SAT::IThread* sat_current_thread() {
 }
 
 void sat_begin_stack_beacon(SAT::StackBeacon* beacon) {
-  SAT::Thread* thread = SAT::thread_instance;
+  SAT::Thread* thread = SAT::current_thread;
+  if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
   if(thread->beaconsCount < SAT::cThreadMaxStackBeacons) {
     if(thread->beaconsCount == 0) {
       beacon->parentBeacon = 0;
@@ -196,7 +193,8 @@ void sat_begin_stack_beacon(SAT::StackBeacon* beacon) {
 }
 
 void sat_end_stack_beacon(SAT::StackBeacon* beacon) {
-  SAT::Thread* thread = SAT::thread_instance;
+  SAT::Thread* thread = SAT::current_thread;
+  if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
   while(thread->beaconsCount && uintptr_t(thread->beacons[thread->beaconsCount-1])<uintptr_t(beacon)) {
     thread->beaconsCount--;
     printf("Error in SAT stack beaon: a previous beacon has been not closed.\n");

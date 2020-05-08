@@ -35,7 +35,7 @@ namespace ZonedBuddyAllocator {
       ZoneCache<7, SubObjectCache<7>> base_cache_7;
 
       void init(Global::Cache* global);
-      IObjectAllocator* getAllocator(int id);
+      SAT::IObjectAllocator* getAllocator(int id);
       int getCachedSize();
       void flushCache();
 
@@ -61,7 +61,7 @@ namespace ZonedBuddyAllocator {
         }
         throw std::exception("Cannot free a not allocated object");
       }
-      IObjectAllocator* getSizeAllocator(size_t size) {
+      SAT::IObjectAllocator* getSizeAllocator(size_t size) {
         int sizeId = SizeMapping::getSizeID(size);
         return this->getAllocator(sizeId);
       }

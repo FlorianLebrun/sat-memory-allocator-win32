@@ -3,7 +3,7 @@
 using namespace SAT;
 
 Thread::Thread(const char* name, uint64_t threadId, int heapId) {
-  assert(!SAT::thread_instance);
+  assert(!SAT::current_thread);
 
   // Get global heap
   GlobalHeap* heap = g_SAT.heaps_table[heapId];
@@ -21,9 +21,7 @@ Thread::Thread(const char* name, uint64_t threadId, int heapId) {
   this->beaconsCount = 0;
 
   // Map to TLS
-  SAT::thread_instance = this;
-  SAT::thread_global_heap = this->global_heap;
-  SAT::thread_local_heap = this->local_heap;
+  SAT::current_thread = this;
 
   // Attach thread
   g_SAT.threads_lock.lock();
@@ -68,7 +66,7 @@ const char* Thread::getName() {
 
 uint64_t Thread::getStackStamp() {
   if (g_SAT.stackStampDatabase) {
-    if (SAT::thread_instance == this) return g_SAT.stackStampDatabase->getStackStamp(0, this->stack_analyzer);
+    if (SAT::current_thread == this) return g_SAT.stackStampDatabase->getStackStamp(0, this->stack_analyzer);
     else return g_SAT.stackStampDatabase->getStackStamp(this, this->stack_analyzer);
   }
   return 0;

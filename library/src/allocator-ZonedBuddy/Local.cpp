@@ -56,7 +56,7 @@ void ZonedBuddyAllocator::Local::Cache::flushCache()
   this->base_cache_0.flushCache(); // 32k
 }
 
-IObjectAllocator* ZonedBuddyAllocator::Local::Cache::getAllocator(int id) {
+SAT::IObjectAllocator* ZonedBuddyAllocator::Local::Cache::getAllocator(int id) {
   switch (id) {
   case 0:
   case 1: return &this->base_cache_0;

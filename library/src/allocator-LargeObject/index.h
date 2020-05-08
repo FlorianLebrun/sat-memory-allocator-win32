@@ -4,12 +4,21 @@
 #include "../base.h"
 
 namespace LargeObjectAllocator {
-  struct Global : public IObjectAllocator {
+  struct Global : public SAT::IObjectAllocator {
     int heapID;
 
     void init(SAT::IHeap* pageHeap);
-    virtual void* allocObject(size_t size, uint64_t meta) override;
-    virtual size_t allocatedSize() override;
+
+    virtual size_t getMaxAllocatedSize() override;
+    virtual size_t getMinAllocatedSize() override;
+    virtual size_t getAllocatedSize(size_t size) override;
+    virtual void* allocate(size_t size) override;
+
+    virtual size_t getMaxAllocatedSizeWithMeta() override;
+    virtual size_t getMinAllocatedSizeWithMeta() override;
+    virtual size_t getAllocatedSizeWithMeta(size_t size) override;
+    virtual void* allocateWithMeta(size_t size, uint64_t meta) override;
+
     size_t freePtr(uintptr_t index);
   };
 

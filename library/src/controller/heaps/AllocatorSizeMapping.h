@@ -6,7 +6,9 @@
 
 namespace SAT {
 
+  template<bool withMeta>
   struct AllocatorSizeMapping {
+  private:
     static const uintptr_t sizeMax = -1;
 
     static const int smallSizeCount = 512;
@@ -21,8 +23,29 @@ namespace SAT {
     uint8_t small_objects_sizemap[smallSizeCount/*index*/]; // size map for 12bit ( size = (index<<3) + 7 )
     uint8_t medium_objects_sizemap[24/*exponent*/][64/*mantisse*/]; // size map for 12bit to 36bit ( size = mantisse<<(exponent+12) + 1<< )
 
-    IObjectAllocator* allocators[256];
+    SAT::IObjectAllocator* allocators[256];
+    
+    static inline size_t getAllocatorSize(IObjectAllocator* allocator) {
+      if(withMeta) return allocator->getMaxAllocatedSizeWithMeta();
+      else return allocator->getMaxAllocatedSize();
+    }
+    static int _compare_allocator(const void* a, const void* b) {
+      return getAllocatorSize(*(IObjectAllocator**)a) - getAllocatorSize(*(IObjectAllocator**)b);
+    }
+    void check() {
+      uintptr_t size, allocSize;
+      uintptr_t sizeLimit = getAllocatorSize(this->allocators[this->numAllocators - 1]);
+      for (size = 0; size <= sizeLimit; size++) {
+        if (IObjectAllocator* allocator = getAllocator(size)) {
+          allocSize = getAllocatorSize(allocator);
+          if (size <= allocSize) continue;
+        }
+        printf("allocator mapping invalid");
+        getchar();
+      }
+    }
 
+  public:
     AllocatorSizeMapping() {
       this->numAllocators = 0;
       memset(this->allocators, 0, sizeof(this->allocators));
@@ -30,7 +53,13 @@ namespace SAT {
     void registerAllocator(IObjectAllocator* allocator) {
       this->allocators[this->numAllocators++] = allocator;
     }
-    IObjectAllocator* getAllocator(int size) {
+    SAT::IObjectAllocator* getMaxAllocator() {
+      return this->allocators[this->numAllocators-1];
+    }
+    SAT::IObjectAllocator* getMinAllocator() {
+      return this->allocators[0];
+    }
+    SAT::IObjectAllocator* getAllocator(int size) {
       if (size <= 4096) {
         int index = (size - 1) >> 3;
         int id = this->small_objects_sizemap[index];
@@ -45,26 +74,11 @@ namespace SAT {
         return this->allocators[id];
       }
     }
-    static int _compare_allocator(const void* a, const void* b) {
-      return (*(IObjectAllocator**)a)->allocatedSize() - (*(IObjectAllocator**)b)->allocatedSize();
-    }
-    void check() {
-      uintptr_t size, allocSize;
-      uintptr_t sizeLimit = this->allocators[this->numAllocators - 1]->allocatedSize();
-      for (size = 0; size <= sizeLimit; size++) {
-        if (IObjectAllocator* alloc = getAllocator(size)) {
-          allocSize = alloc->allocatedSize();
-          if (size <= allocSize) continue;
-        }
-        printf("allocator mapping invalid");
-        getchar();
-      }
-    }
     void finalize() {
       qsort(this->allocators, this->numAllocators, sizeof(IObjectAllocator*), &this->_compare_allocator);
 
       uintptr_t curAllocId = 0;
-      uintptr_t curAllocSize = this->allocators[0]->allocatedSize();
+      uintptr_t curAllocSize = getAllocatorSize(this->allocators[0]);
 
       for (int size = 1; size <= 4096; size++) {
         // size -> index
@@ -107,7 +121,7 @@ namespace SAT {
 
         // Find the first matching allocator
         while (max_size > curAllocSize && curAllocId < this->numAllocators) {
-          if (IObjectAllocator* alloc = this->allocators[++curAllocId]) curAllocSize = alloc->allocatedSize();
+          if (IObjectAllocator* allocator = this->allocators[++curAllocId]) curAllocSize = getAllocatorSize(allocator);
           else curAllocSize = 0;
         }
 
@@ -125,7 +139,7 @@ namespace SAT {
 
           // Find the first matching allocator
           while (max_size > curAllocSize && curAllocId < this->numAllocators) {
-            if (IObjectAllocator* alloc = this->allocators[++curAllocId]) curAllocSize = alloc->allocatedSize();
+            if (IObjectAllocator* allocator = this->allocators[++curAllocId]) curAllocSize = getAllocatorSize(allocator);
             else curAllocSize = 0;
           }
 

@@ -59,7 +59,7 @@ namespace ZonedBuddyAllocator {
       ZoneCache<7, SubObjectCache<7> > base_cache_7;
 
       void init(SAT::IHeap* pageHeap, int pageID = SAT::tEntryID::PAGE_ZONED_BUDDY);
-      IObjectAllocator* getAllocator(int id);
+      SAT::IObjectAllocator* getAllocator(int id);
       int getCachedSize();
       void flushCache();
 

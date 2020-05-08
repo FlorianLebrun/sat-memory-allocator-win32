@@ -4,7 +4,11 @@ void LargeObjectAllocator::Global::init(SAT::IHeap* heap) {
   this->heapID = heap->getID();
 }
 
-void* LargeObjectAllocator::Global::allocObject(size_t size, uint64_t meta) {
+void* LargeObjectAllocator::Global::allocate(size_t size) {
+  return this->LargeObjectAllocator::Global::allocateWithMeta(size, 0);
+}
+
+void* LargeObjectAllocator::Global::allocateWithMeta(size_t size, uint64_t meta) {
 
   // Allocate memory space
   uint32_t length = alignX<int32_t>(size, SAT::cSegmentSize) >> SAT::cSegmentSizeL2;
@@ -19,8 +23,28 @@ void* LargeObjectAllocator::Global::allocObject(size_t size, uint64_t meta) {
   return (void*)(index << SAT::cSegmentSizeL2);
 }
 
-size_t LargeObjectAllocator::Global::allocatedSize() {
+size_t LargeObjectAllocator::Global::getMaxAllocatedSize() {
   return g_SATable->SATDescriptor.limit << SAT::cSegmentSizeL2;
+}
+
+size_t LargeObjectAllocator::Global::getMinAllocatedSize() {
+  return SAT::cSegmentSize;
+}
+
+size_t LargeObjectAllocator::Global::getAllocatedSize(size_t size) {
+  return alignX<int32_t>(size, SAT::cSegmentSize);
+}
+
+size_t LargeObjectAllocator::Global::getMaxAllocatedSizeWithMeta() {
+  return this->LargeObjectAllocator::Global::getMaxAllocatedSize();
+}
+
+size_t LargeObjectAllocator::Global::getMinAllocatedSizeWithMeta() {
+  return this->LargeObjectAllocator::Global::getMinAllocatedSize();
+}
+
+size_t LargeObjectAllocator::Global::getAllocatedSizeWithMeta(size_t size) {
+  return this->LargeObjectAllocator::Global::getAllocatedSize(size);
 }
 
 bool LargeObjectAllocator::get_address_infos(uintptr_t ptr, SAT::tpObjectInfos infos) {

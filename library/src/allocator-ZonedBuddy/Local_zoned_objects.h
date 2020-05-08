@@ -3,12 +3,13 @@ namespace ZonedBuddyAllocator {
   namespace Local {
 
     template<class TBaseCache, int sizeID, int dividor>
-    struct ZonedObjectCache : IObjectAllocator
+    struct ZonedObjectCache : SAT::IObjectAllocator
     {
       typedef Global::ZonedObjectCache<typename TBaseCache::tGlobalCache, sizeID, dividor>* GlobalCache;
 
       static const int subSizeID = sizeID | (dividor << 2);
       static const int subObjectSize = (((supportSize >> sizeID) - sizeof(tZone)) / dividor)&(-8);
+      static const size_t allocatedSize = subObjectSize;
 
       GlobalCache global;
       TBaseCache* heap;
@@ -68,22 +69,30 @@ namespace ZonedBuddyAllocator {
 
         return this->objects.pop();
       }
-      virtual size_t allocatedSize() override {
-        return subObjectSize;
-      }
-      virtual void* allocObject(size_t, uint64_t meta) override
+
+      virtual size_t getMaxAllocatedSize() override {return allocatedSize;}
+      virtual size_t getMinAllocatedSize() override {return allocatedSize;}
+      virtual size_t getAllocatedSize(size_t size) override {return allocatedSize;}
+      virtual size_t getMaxAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getMinAllocatedSizeWithMeta() override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+      virtual size_t getAllocatedSizeWithMeta(size_t size) override {return allocatedSize-sizeof(SAT::tObjectMetaData);}
+
+      virtual void* allocate(size_t size) override
       {
         ZoneObject obj = this->acquireObject();
         assert(obj->tag[0] == cZONETAG_FREE);
-        if(meta) {
-          obj->meta = meta;
-          obj->tag[0] = cZONETAG_ALLOCATED_BIT|cZONETAG_METADATA_BIT;
-          return &((uint64_t*)obj)[1];
-        }
-        else {
-          obj->tag[0] = cZONETAG_ALLOCATED_BIT;
-          return obj;
-        }
+        assert(size <= this->getMaxAllocatedSize());
+        obj->tag[0] = cZONETAG_ALLOCATED_BIT;
+        return obj;
+      }
+      virtual void* allocateWithMeta(size_t size, uint64_t meta) override
+      {
+        ZoneObject obj = this->acquireObject();
+        assert(obj->tag[0] == cZONETAG_FREE);
+        assert(size <= this->getMaxAllocatedSizeWithMeta());
+        obj->meta = meta;
+        obj->tag[0] = cZONETAG_ALLOCATED_BIT|cZONETAG_METADATA_BIT;
+        return &((uint64_t*)obj)[1];
       }
       void scavengeOverflow(int remain) {
         SAT_TRACE(printf("scavengeOverflow\n"));

@@ -12,15 +12,23 @@ namespace SAT {
   struct GlobalHeap;
 
   struct BaseHeap : SATBasicRealeasable<IHeap> {
-    AllocatorSizeMapping sizeMapping;
+    AllocatorSizeMapping<false> sizeMapping;
+    AllocatorSizeMapping<true> sizeMappingWithMeta;
     int id;
 
     virtual ~BaseHeap() = 0;
     virtual int getID() override final;
+    
+    virtual size_t getMaxAllocatedSize() override;
+    virtual size_t getMinAllocatedSize() override;
+    virtual size_t getAllocatedSize(size_t size) override;
+    virtual void* allocate(size_t size) override final;
 
-    void* allocTraced(size_t size, uint64_t meta);
+    virtual size_t getMaxAllocatedSizeWithMeta() override;
+    virtual size_t getMinAllocatedSizeWithMeta() override;
+    virtual size_t getAllocatedSizeWithMeta(size_t size) override;
+    virtual void* allocateWithMeta(size_t size, uint64_t meta) override final;
 
-    void* alloc(size_t size, uint64_t meta);
     virtual size_t free(void* ptr) = 0;
     virtual void flushCache() = 0;
     virtual void terminate() = 0;
@@ -36,8 +44,7 @@ namespace SAT {
     GlobalHeap(const char* name);
     virtual const char* getName() override final;
     virtual void destroy() override final;
-
-    virtual void* allocBuffer(size_t size, SAT::tObjectMetaData meta) override final;
+    
     virtual uintptr_t acquirePages(size_t size) override;
     virtual void releasePages(uintptr_t index, size_t size) override;
 
@@ -51,8 +58,7 @@ namespace SAT {
     LocalHeap(GlobalHeap* global);
     virtual const char* getName() override final;
     virtual void destroy() override final;
-
-    virtual void* allocBuffer(size_t size, SAT::tObjectMetaData meta) override final;
+    
     virtual uintptr_t acquirePages(size_t size) override final;
     virtual void releasePages(uintptr_t index, size_t size) override final;
   };
