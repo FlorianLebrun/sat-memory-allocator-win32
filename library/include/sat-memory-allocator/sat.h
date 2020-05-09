@@ -43,23 +43,26 @@ namespace SAT {
       this->size = size;
       return *this;
     }
-    bool checkOverflow() {
+    void* detectOverflow() {
       if(this->meta.isOverflowProtected) {
+        uint32_t paddingEnd = this->size-sizeof(uint32_t);
 
         // Read and check padding size
-        uint32_t bufferSize = *(uint32_t*)(this->base+this->size-sizeof(uint32_t));
-        bufferSize ^= 0xabababab;
-        if(bufferSize > this->size) return false;
+        uint32_t* pBufferSize = (uint32_t*)(this->base+paddingEnd);
+        uint32_t bufferSize = (*pBufferSize) ^ 0xabababab;
+        if(bufferSize > this->size) {
+          return pBufferSize;
+        }
 
         // Read and check padding bytes
         uint8_t* bytes = (uint8_t*)this->base;
-        for(int i=this->size-sizeof(uint32_t)-1;i>=bufferSize;i--) {
+        for(int i=bufferSize;i<paddingEnd;i++) {
           if(bytes[i] != 0xab) {
-            return false;
+            return &bytes[i];
           }
         }
       }
-      return true;
+      return 0;
     }
   } *tpObjectInfos;
 

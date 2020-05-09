@@ -46,7 +46,7 @@ bool SAT::Controller::checkObjectsOverflow() {
       this->invalidsCount = 0;
     }
     virtual bool visit(SAT::tpObjectInfos obj) override {
-      if(!obj->checkOverflow()) {
+      if(void* overflowPtr = obj->detectOverflow()) {
         this->invalidsCount++;
       }
       this->objectsCount++;
