@@ -29,38 +29,52 @@ size_t BaseHeap::getAllocatedSizeWithMeta(size_t size) {
   return this->sizeMappingWithMeta.getAllocator(size)->getAllocatedSizeWithMeta(size);
 }
 
+#define UseOverflowProtection 1
+
 void* BaseHeap::allocate(size_t size)
-{
-#ifdef _DEBUG
-  size_t cfsize = size;
-#endif
+{  
+#if UseOverflowProtection
+  void* ptr = this->allocateWithMeta(size, 0);
+#else
   SAT::IObjectAllocator* allocator = this->sizeMapping.getAllocator(size);
   void* ptr = allocator->allocate(size);
+#endif
 
 #ifdef _DEBUG
   SAT_DEBUG_CHECK(SAT::tObjectInfos infos);
   SAT_DEBUG_CHECK(bool hasInfos = sat_get_address_infos(ptr, &infos));
   SAT_DEBUG_CHECK(assert(hasInfos));
   SAT_DEBUG_CHECK(assert(infos.base == uintptr_t(ptr)));
-  SAT_DEBUG_CHECK(assert(infos.size >= cfsize));
+  SAT_DEBUG_CHECK(assert(infos.size >= size));
 #endif
   return ptr;
 }
 
 void* BaseHeap::allocateWithMeta(size_t size, uint64_t meta)
 {
-#ifdef _DEBUG
-  size_t cfsize = size;
-#endif
+#if UseOverflowProtection
+  static const size_t paddingMinSize = 8;
+  SAT::IObjectAllocator* allocator = this->sizeMappingWithMeta.getAllocator(size+paddingMinSize);
+  void* ptr = allocator->allocateWithMeta(size+paddingMinSize, meta|tObjectMetaData::cIsOverflowProtected_Bit);
+
+  // Write overflow detection bytes
+  size_t allocatedSize = allocator->getAllocatedSizeWithMeta(size);
+  uint32_t& bufferSize = *(uint32_t*)(((uint8_t*)ptr)+allocatedSize-sizeof(uint32_t));
+  bufferSize = size^0xabababab;
+  uint8_t* paddingBytes = ((uint8_t*)ptr)+size;
+  memset(paddingBytes, 0xab, allocatedSize-size-sizeof(uint32_t));
+
+#else
   SAT::IObjectAllocator* allocator = this->sizeMappingWithMeta.getAllocator(size);
   void* ptr = allocator->allocateWithMeta(size, meta);
+#endif
 
 #ifdef _DEBUG
   SAT_DEBUG_CHECK(SAT::tObjectInfos infos);
   SAT_DEBUG_CHECK(bool hasInfos = sat_get_address_infos(ptr, &infos));
   SAT_DEBUG_CHECK(assert(hasInfos));
   SAT_DEBUG_CHECK(assert(infos.base == uintptr_t(ptr)));
-  SAT_DEBUG_CHECK(assert(infos.size >= cfsize));
+  SAT_DEBUG_CHECK(assert(infos.size >= size));
   SAT_DEBUG_CHECK(assert(infos.meta.bits == meta));
 #endif
   return ptr;

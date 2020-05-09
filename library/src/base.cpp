@@ -157,7 +157,7 @@ bool sat_get_address_infos(void* ptr, SAT::tpObjectInfos infos) {
     case SAT::tEntryID::PAGE_SCALED_BUDDY_13:
     case SAT::tEntryID::PAGE_SCALED_BUDDY_15:
       if (infos) {
-        infos->set(entry->getHeapID(), uintptr_t(ptr), 0, false);
+        infos->set(entry->getHeapID(), uintptr_t(ptr), 0);
       }
       return true;
     }

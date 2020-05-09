@@ -12,10 +12,12 @@ void test_meta_alloc() {
 void test_buffer_alloc() {
   printf("------------------ Test buffer alloc ------------------\n");
   void* ptr;
-
+  
   ptr = sat_malloc(0);
   sat_free(ptr);
 
   ptr = sat_malloc(10);
+  ((char*)ptr)[10] = 1;
+  sat_get_contoller()->checkObjectsOverflow();
   sat_free(ptr);
 }

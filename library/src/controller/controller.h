@@ -65,6 +65,7 @@ namespace SAT {
     virtual IProfile* createProfile() override final;
     virtual void traverseObjects(SAT::IObjectVisitor* visitor, uintptr_t target_address) override final;
     virtual void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) override final;
+    virtual bool checkObjectsOverflow() override final;
 
     // Timing
     virtual double getCurrentTime() override final;

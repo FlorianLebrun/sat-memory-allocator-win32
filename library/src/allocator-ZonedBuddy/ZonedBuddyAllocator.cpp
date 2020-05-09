@@ -65,7 +65,6 @@ namespace ZonedBuddyAllocator {
       // Find object
       uintptr_t sizeID = tag&cTAG_SIZEID_MASK;
       uintptr_t sizeL2 = supportSizeL2 - sizeID;
-      uint64_t meta = 0;
       Object obj = Object(ptr & -(1 << sizeL2));
 
       // Get infos
@@ -79,20 +78,22 @@ namespace ZonedBuddyAllocator {
         uint8_t tag = zone->tags[index];
         if (tag & cZONETAG_ALLOCATED_BIT) {
           if (tag&cZONETAG_METADATA_BIT) {
-            meta = ((uint64_t*)base)[0];
-            base += sizeof(uint64_t);
+            if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), subObjectSize-sizeof(uint64_t), ((uint64_t*)base)[0]);
           }
-          if (infos) infos->set(entry->heapID, base, subObjectSize, meta);
+          else {
+            if (infos) infos->set(entry->heapID, base, subObjectSize);
+          }
           return true;
         }
       }
       else {
         uintptr_t base = uintptr_t(obj) + tObject::headerSize;
         if (obj->tag&cTAG_METADATA_BIT) {
-          meta = ((uint64_t*)base)[0];
-          base += sizeof(uint64_t);
+          if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), (1<<sizeL2)-sizeof(uint64_t), ((uint64_t*)base)[0]);
         }
-        if (infos) infos->set(entry->heapID, base, 1 << sizeL2, meta);
+        else {
+          if (infos) infos->set(entry->heapID, base, 1<<sizeL2);
+        }
         return true;
       }
     }
@@ -107,10 +108,13 @@ namespace ZonedBuddyAllocator {
     for (int i = 0; i < dividor && visitMore; i++) {
       uint8_t tag = zone->tags[i];
       if (tag & cZONETAG_ALLOCATED_BIT) {
-        uint64_t meta = 0;
         uint64_t* base = ((uint64_t*)ptr);
-        if (tag&cZONETAG_METADATA_BIT) meta = (base++)[0];
-        visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base), size, meta));
+        if (tag&cZONETAG_METADATA_BIT) {
+          visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base)+sizeof(uint64_t), size-sizeof(uint64_t), base[0]));
+        }
+        else {
+          visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base), size));
+        }
       }
       ptr += size;
     }
@@ -123,13 +127,15 @@ namespace ZonedBuddyAllocator {
           traverseZonedObjects(entry, Zone(obj), size, visitMore, visitor);
         }
         else {
-          uint64_t meta = 0;
           int offset = tObject::headerSize;
           if (obj->tag&cTAG_METADATA_BIT) {
-            meta = obj->content()[0];
+            uint64_t meta = obj->content()[0];
             offset += sizeof(uint64_t);
+            visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset, meta));
           }
-          visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset, meta));
+          else {
+            visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset));
+          }
         }
       }
       ptr += size;

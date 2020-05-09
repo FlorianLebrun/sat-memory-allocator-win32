@@ -37,6 +37,27 @@ void SAT::Controller::traverseObjects(SAT::IObjectVisitor* visitor, uintptr_t st
   }
 }
 
+bool SAT::Controller::checkObjectsOverflow() {
+  struct Visitor: SAT::IObjectVisitor {
+    int objectsCount;
+    int invalidsCount;
+    Visitor() {
+      this->objectsCount = 0;
+      this->invalidsCount = 0;
+    }
+    virtual bool visit(SAT::tpObjectInfos obj) override {
+      if(!obj->checkOverflow()) {
+        this->invalidsCount++;
+      }
+      this->objectsCount++;
+      return true;
+    }
+  };
+  Visitor visitor;
+  this->traverseObjects(&visitor, 0);
+  return true;
+}
+
 IHeap* SAT::Controller::getHeap(int id) {
   if (id >= 0 && id < 256) return this->heaps_table[id];
   return 0;

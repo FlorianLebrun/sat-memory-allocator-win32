@@ -11,13 +11,15 @@ namespace SAT {
   typedef struct tObjectMetaData {
     static const uint64_t cIsReferer_Bit = uint64_t(1) << 32;
     static const uint64_t cIsStamped_Bit = uint64_t(1) << 33;
+    static const uint64_t cIsOverflowProtected_Bit = uint64_t(1) << 34;
     static const uint64_t cTypeID_Mask = 0xffffffff;
     union {
       struct {
         uint32_t typeID;
         unsigned short isReferer : 1; // true, when the object has reference to other data
         unsigned short isStamped : 1; // true, when the object has been stamped by a tracker
-        unsigned short __bit_reserve_0 : 14;
+        unsigned short isOverflowProtected : 1; // true, when the object has canary words at buffer end
+        unsigned short __bit_reserve_0 : 13;
         uint16_t numRef; // ref counter for cached object (avoid releasing of cached object)
       };
       uint64_t bits;
@@ -33,19 +35,31 @@ namespace SAT {
     tObjectMetaData meta;
     tObjectStamp stamp;
 
-    tObjectInfos& set(int heapID, uintptr_t base, size_t size, uint64_t meta) {
+    tObjectInfos& set(int heapID, uintptr_t base, size_t size, uint64_t meta = 0) {
       this->heapID = heapID;
       this->stamp = tObjectStamp(0, 0);
-      if (this->meta.bits = meta) {
-        if (this->meta.isStamped) {
-          this->stamp = *tpObjectStamp(base);
-          base += sizeof(SAT::tObjectStamp);
-          size -= sizeof(uint64_t);
-        }
-      }
+      this->meta.bits = meta;
       this->base = base;
       this->size = size;
       return *this;
+    }
+    bool checkOverflow() {
+      if(this->meta.isOverflowProtected) {
+
+        // Read and check padding size
+        uint32_t bufferSize = *(uint32_t*)(this->base+this->size-sizeof(uint32_t));
+        bufferSize ^= 0xabababab;
+        if(bufferSize > this->size) return false;
+
+        // Read and check padding bytes
+        uint8_t* bytes = (uint8_t*)this->base;
+        for(int i=this->size-sizeof(uint32_t)-1;i>=bufferSize;i--) {
+          if(bytes[i] != 0xab) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
   } *tpObjectInfos;
 
@@ -54,7 +68,6 @@ namespace SAT {
   };
 
   struct IObjectAllocator {
-    typedef void* (IObjectAllocator::*f_malloc)(uint64_t meta);
 
     virtual size_t getMaxAllocatedSize() = 0;
     virtual size_t getMinAllocatedSize() = 0;
@@ -105,6 +118,7 @@ namespace SAT {
     virtual IProfile* createProfile() = 0;
     virtual void traverseObjects(IObjectVisitor* visitor, uintptr_t start_address = 0) = 0;
     virtual void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) = 0;
+    virtual bool checkObjectsOverflow() = 0;
 
     // Timing
     virtual double getCurrentTime() = 0;
