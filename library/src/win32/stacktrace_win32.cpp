@@ -84,17 +84,16 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
   const int maxStackFrames = 1024;
   char _frames_buffer[sizeof(SAT::StackMarker)*maxStackFrames];
   bool useCompactMarker = true;
+  bool captureOtherThread = this->handle.id != GetCurrentThreadId();
 
   static tTimes times;
+  Chrono c, ct, cs;
   tTimes delta;
-
-  Chrono c, ct;
-
+  
+  // Get thread cpu context
   CONTEXT context;
   memset(&context, 0, sizeof(context));
   context.ContextFlags = CONTEXT_CONTROL|CONTEXT_INTEGER;
-
-  bool captureOtherThread = this->handle.id != GetCurrentThreadId();
   if (captureOtherThread) {
 
     // Suspend thread
@@ -119,45 +118,59 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
     return 0;
   }
 
-
-  Chrono cs;
-  // Get thread registers and unwinds
+  // Initiate markers stack
   int markerCount = 0;
   SAT::StackBeacon* currentBeacon = beaconsCount?this->beacons[beaconsCount-1]:0;
   SAT::StackMarker* markers = (SAT::StackMarker*)&_frames_buffer[sizeof(SAT::StackMarker)*maxStackFrames];
-  while (uintptr_t(markers) > uintptr_t(_frames_buffer))
+
+  // Unwinds stackframes and stack beacons
+  if (context.Rip == 0 && context.Rsp != 0) {
+    context.Rip = (ULONG64)(*(PULONG64)context.Rsp);
+    context.Rsp += 8;
+  }
+  while (context.Rip && uintptr_t(markers) > uintptr_t(_frames_buffer))
   {
+    // Add a marker for stack beacon, when detect entry into a beacon
     while(currentBeacon && uintptr_t(currentBeacon) < uintptr_t(context.Rsp)) {
       markers--;
       currentBeacon->createrMarker(*markers);
       markerCount++;
       currentBeacon = currentBeacon->parentBeacon;
     }
-
+    
+    // Goto next stackframe
     cs.Start();
-    DWORD64 ImageBase;
+    DWORD64 ImageBase, BaseAddress, InsAddress;
     PRUNTIME_FUNCTION pFunctionEntry = ::RtlLookupFunctionEntry(context.Rip, &ImageBase, NULL);
-    if (!pFunctionEntry)break;
+    if(pFunctionEntry) {
+      PVOID HandlerData;
+      DWORD64 EstablisherFrame;
+      InsAddress = context.Rip;
+      BaseAddress = ImageBase + pFunctionEntry->BeginAddress;
+      ::RtlVirtualUnwind(UNW_FLAG_NHANDLER,
+        ImageBase,
+        InsAddress,
+        pFunctionEntry,
+        &context,
+        &HandlerData,
+        &EstablisherFrame,
+        NULL);
+    }
+    else {
+      InsAddress = context.Rip;
+      BaseAddress = context.Rip;
+      context.Rip = (ULONG64)(*(PULONG64)context.Rsp);
+      context.Rsp += 8;
+    }
     delta.unwind_lookup_time += cs.GetDiffDouble(Chrono::US);
 
-    cs.Start();
-    DWORD64 EstablisherFrame = 0;
-    ::RtlVirtualUnwind(UNW_FLAG_NHANDLER,
-      ImageBase,
-      context.Rip,
-      pFunctionEntry,
-      &context,
-      NULL,
-      &EstablisherFrame,
-      NULL);
-    delta.unwind_move_time += cs.GetDiffDouble(Chrono::US);
-
+    // Add marker for stackframe, when not under a stack beacon
     if(!currentBeacon) {
       markers--;
       NativeStackMarker* nativeMarker = markers->as<NativeStackMarker>();
-      nativeMarker->base = ImageBase + pFunctionEntry->BeginAddress; // Function entrypoint
+      nativeMarker->base = BaseAddress; // Function entrypoint
       if(!useCompactMarker) {
-        nativeMarker->callsite = context.Rip; // Callsite -> Function entrypoint
+        nativeMarker->callsite = InsAddress; // Callsite -> Function entrypoint
       }
       markerCount++;
     }

@@ -159,58 +159,6 @@ bool SystemThreading::GetThreadName(SystemThreading::tThread* thread, char* buff
   return true;
 }
 
-/*__declspec(noinline) int SystemThreading::CaptureThreadStackTrace(tThread* thread, void** BackTrace, int BackTraceLen, uintptr_t& BackTraceHash) {
-if (thread) {
-int NumFrame = 0;
-
-// Suspend thread
-if (::SuspendThread(thread->handle) < 0) return 0;
-
-// Get thread registers and unwinds
-CONTEXT context;
-context.ContextFlags = CONTEXT_FULL;
-if (::GetThreadContext(thread->handle, &context) != 0) {
-BackTraceHash = 0;
-while (NumFrame < BackTraceLen)
-{
-DWORD64 ImageBase;
-PRUNTIME_FUNCTION pFunctionEntry = ::RtlLookupFunctionEntry(context.Rip, &ImageBase, NULL);
-if (!pFunctionEntry)break;
-
-PVOID HandlerData;
-DWORD64 EstablisherFrame;
-::RtlVirtualUnwind(UNW_FLAG_NHANDLER,
-ImageBase,
-context.Rip,
-pFunctionEntry,
-&context,
-&HandlerData,
-&EstablisherFrame,
-NULL);
-
-BackTraceHash += context.Rip;
-BackTrace[NumFrame++] = (void*)(ImageBase + pFunctionEntry->BeginAddress); // Function entrypoint
-//BackTrace[NumFrame++] = (PVOID)context.Rip; // Callsite -> Function entrypoint
-}
-}
-else {
-BackTraceHash = 0;
-BackTraceLen = 0;
-}
-
-// Release thread
-::ResumeThread(thread->handle);
-return NumFrame;
-}
-else {
-// Read stack trace
-DWORD cBackTraceHash;
-BackTraceLen = ::RtlCaptureStackBackTrace(0, 1024, BackTrace, &cBackTraceHash);
-BackTraceHash = cBackTraceHash;
-return BackTraceLen;
-}
-}*/
-
 bool SystemThreading::tSymbol::resolve(uintptr_t address)
 {
   static bool isSymInitiate = false;
