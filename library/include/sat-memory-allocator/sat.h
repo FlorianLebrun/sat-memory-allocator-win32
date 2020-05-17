@@ -2,6 +2,8 @@
 #error "bad include"
 #endif
 
+#include <atomic>
+
 namespace SAT {
 
   enum class tHeapType {
@@ -24,7 +26,15 @@ namespace SAT {
       };
       uint64_t bits;
     };
-    tObjectMetaData(uint64_t bits = 0) { this->bits = bits; }
+    tObjectMetaData(uint64_t bits = 0) {
+      this->bits = bits;
+    }
+    void lock() {
+      ((std::atomic_int16_t*)&this->numRef)->fetch_add(1);
+    }
+    void unlock() {
+      ((std::atomic_int16_t*)&this->numRef)->fetch_sub(1);
+    }
   } *tpObjectMetaData;
   static_assert(sizeof(tObjectMetaData) == sizeof(uint64_t), "tObjectMetaData bad size");
 
@@ -32,19 +42,17 @@ namespace SAT {
     uint8_t heapID;
     size_t size;
     uintptr_t base;
-    tObjectMetaData meta;
-    tObjectStamp stamp;
+    tpObjectMetaData meta;
 
-    tObjectInfos& set(int heapID, uintptr_t base, size_t size, uint64_t meta = 0) {
+    tObjectInfos& set(int heapID, uintptr_t base, size_t size, uint64_t* meta = 0) {
       this->heapID = heapID;
-      this->stamp = tObjectStamp(0, 0);
-      this->meta.bits = meta;
+      this->meta = tpObjectMetaData(meta);
       this->base = base;
       this->size = size;
       return *this;
     }
     void* detectOverflow() {
-      if(this->meta.isOverflowProtected) {
+      if(this->meta && this->meta->isOverflowProtected) {
         uint32_t paddingEnd = this->size-sizeof(uint32_t);
 
         // Read and check padding size

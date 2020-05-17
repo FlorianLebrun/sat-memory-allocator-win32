@@ -54,7 +54,7 @@ bool LargeObjectAllocator::get_address_infos(uintptr_t ptr, SAT::tpObjectInfos i
       entry->heapID,
       uintptr_t(ptr)&SAT::cSegmentPtrMask,
       entry->length << SAT::cSegmentSizeL2,
-      entry->meta);
+      &entry->meta);
   }
   return true;
 }

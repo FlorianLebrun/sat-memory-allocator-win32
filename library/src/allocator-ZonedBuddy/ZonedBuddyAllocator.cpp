@@ -78,7 +78,7 @@ namespace ZonedBuddyAllocator {
         uint8_t tag = zone->tags[index];
         if (tag & cZONETAG_ALLOCATED_BIT) {
           if (tag&cZONETAG_METADATA_BIT) {
-            if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), subObjectSize-sizeof(uint64_t), ((uint64_t*)base)[0]);
+            if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), subObjectSize-sizeof(uint64_t), (uint64_t*)base);
           }
           else {
             if (infos) infos->set(entry->heapID, base, subObjectSize);
@@ -89,7 +89,7 @@ namespace ZonedBuddyAllocator {
       else {
         uintptr_t base = uintptr_t(obj) + tObject::headerSize;
         if (obj->tag&cTAG_METADATA_BIT) {
-          if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), (1<<sizeL2)-sizeof(uint64_t), ((uint64_t*)base)[0]);
+          if (infos) infos->set(entry->heapID, base+sizeof(uint64_t), (1<<sizeL2)-sizeof(uint64_t), (uint64_t*)base);
         }
         else {
           if (infos) infos->set(entry->heapID, base, 1<<sizeL2);
@@ -110,7 +110,7 @@ namespace ZonedBuddyAllocator {
       if (tag & cZONETAG_ALLOCATED_BIT) {
         uint64_t* base = ((uint64_t*)ptr);
         if (tag&cZONETAG_METADATA_BIT) {
-          visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base)+sizeof(uint64_t), size-sizeof(uint64_t), base[0]));
+          visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base)+sizeof(uint64_t), size-sizeof(uint64_t), base));
         }
         else {
           visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(base), size));
@@ -129,9 +129,8 @@ namespace ZonedBuddyAllocator {
         else {
           int offset = tObject::headerSize;
           if (obj->tag&cTAG_METADATA_BIT) {
-            uint64_t meta = obj->content()[0];
             offset += sizeof(uint64_t);
-            visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset, meta));
+            visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset, obj->content()));
           }
           else {
             visitMore = visitor->visit(&SAT::tObjectInfos().set(entry->heapID, uintptr_t(obj) + offset, size - offset));
