@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"tools": "../../../cmake-tools"
+	}
+}

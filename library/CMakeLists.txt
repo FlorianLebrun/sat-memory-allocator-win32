@@ -35,7 +35,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Create library
 add_library(${target} SHARED ${files})
 set_target_properties(${target} PROPERTIES FOLDER "ThirdParty")
-set_project_dll_properties(${target})
 
 # Set compile properties
 target_include_directories(${target} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+# Setting for development comfort
+if(DEVMODE AND SATMEM_POST_BUILD_DIRS)
+set_target_postbuild_copy(${target} TO ${SATMEM_POST_BUILD_DIRS})
+endif()
