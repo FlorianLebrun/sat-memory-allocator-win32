@@ -1,7 +1,7 @@
 #ifndef SAT_LargeObjectAllocator_h_
 #define SAT_LargeObjectAllocator_h_
 
-#include "../base.h"
+#include "../../base.h"
 
 namespace LargeObjectAllocator {
   struct Global : public SAT::IObjectAllocator {

@@ -1,5 +1,5 @@
 #include "../base.h"
-#include "../allocator-ZonedBuddy/index.h"
+#include "../allocators/ZonedBuddy/index.h"
 
 using namespace SAT;
 

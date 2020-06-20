@@ -1,5 +1,5 @@
 
-#include "../../base.h"
+#include "../base.h"
 
 #ifndef _SAT_heaps_AllocatorSizeMapping_h_
 #define _SAT_heaps_AllocatorSizeMapping_h_

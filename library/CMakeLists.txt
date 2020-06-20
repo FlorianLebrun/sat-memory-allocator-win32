@@ -3,17 +3,22 @@ set(target sat-memory-allocator)
 # Collect source files
 append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIES 
   "./"
-  "./allocator-LargeObject"
-  "./allocator-ZonedBuddy"
-  #"./allocator-Buddy"
-  #"./allocator-ScaledBuddy"
-  #"./allocator-ZonedPage"
+
+  "./allocators"
+  "./allocators/LargeObject"
+  "./allocators/ZonedBuddy"
+  #"./allocators/Buddy"
+  #"./allocators/ScaledBuddy"
+  #"./allocators/ZonedPage"
+
+  "./heaps"
+  "./heaps/Compact"
+
   "./controller"
   "./controller/connector"
-  "./controller/heaps"
   "./controller/profiler"
   "./controller/threads"
-  "./heap-Compact"
+
   "./types"
   "./utils"
 
@@ -23,7 +28,6 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIE
 )
 append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" DIRECTORIES 
   "./include/sat-memory-allocator"
-  "./include/sat-memory-allocator/features"
 )
 
 # Add linker def file

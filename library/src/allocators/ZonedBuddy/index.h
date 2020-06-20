@@ -1,7 +1,7 @@
 #ifndef SAT_ZonedBuddyAllocator_h_
 #define SAT_ZonedBuddyAllocator_h_
 
-#include "../base.h"
+#include "../../base.h"
 
 #define OBJECT_LIST_CHECK(x)// x
 #define SAT_TRACE_ALLOC(x)// x

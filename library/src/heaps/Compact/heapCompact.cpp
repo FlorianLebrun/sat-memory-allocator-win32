@@ -1,5 +1,5 @@
-#include "../allocator-ZonedBuddy/index.h"
-#include "../allocator-LargeObject/index.h"
+#include "../../allocators/ZonedBuddy/index.h"
+#include "../../allocators/LargeObject/index.h"
 
 
 struct Global : SAT::GlobalHeap {

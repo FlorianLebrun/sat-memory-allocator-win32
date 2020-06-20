@@ -17,13 +17,8 @@ sat_get_types_controller
 sat_get_address_infos
 sat_has_address
 sat_types_base
-sat_connect
 
-sat_mark
-sat_mark_message
-sat_event_message
 sat_current_thread
-sat_marking_print
 
 sat_begin_stack_beacon
 sat_end_stack_beacon

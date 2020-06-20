@@ -36,7 +36,7 @@ namespace SAT {
       this->word64[1] = other.word64[1];
       this->word64[2] = other.word64[2];
     }
-    virtual void getSymbol(char* buffer, int size) override final {
+    virtual void getSymbol(char* buffer, int size) override {
       buffer[0] = 0;
     }
   };

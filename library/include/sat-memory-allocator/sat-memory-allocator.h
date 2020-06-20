@@ -43,7 +43,6 @@ namespace SAT {
 #include "./tracing.h"
 #include "./profile.h"
 #include "./sat.h"
-#include "./marking.h"
 
 extern"C" void _satmalloc_init();
 
