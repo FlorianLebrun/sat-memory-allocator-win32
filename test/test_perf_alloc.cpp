@@ -154,31 +154,18 @@ struct tTest {
     SAT::IThread* thread = sat->getCurrentThread();
     SAT::Mark mark;
 
-    SAT::Mark test_mark = sat_mark_message("test", "Test begin");
-
-    mark = sat_mark_message("test", "sat_malloc test 2");
     this->test_sat_malloc_2();
-    mark->complete();
     Sleep(50);
 
 #ifdef USE_TCMALLOC
-    mark = sat_mark_message("test", "tc_malloc");
     this->test_tc_malloc();
-    mark->complete();
     Sleep(50);
 #endif
 
-    mark = sat_mark_message("test", "sat_malloc");
     this->test_sat_malloc();
-    mark->complete();
     Sleep(50);
 
-    mark = sat_mark_message("test", "default_malloc");
     this->test_default_malloc();
-    sat_marking_print();
-    mark->complete();
-
-    test_mark->complete();
 
   }
 };

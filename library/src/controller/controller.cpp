@@ -249,8 +249,7 @@ uintptr_t SATEntryToString(uintptr_t index, char* out) {
   case SAT::tEntryID::SAT_SEGMENT: name = "SAT_SEGMENT"; break;
   case SAT::tEntryID::FREE: name = "FREE"; break;
   case SAT::tEntryID::FORBIDDEN: name = "FORBIDDEN"; break;
-  case SAT::tEntryID::STREAM_SEGMENT: name = "STREAM_SEGMENT"; break;
-  case SAT::tEntryID::STACKSTAMP_DATABASE: name = "STACKSTAMP_DATABASE"; break;
+  case SAT::tEntryID::PROFILING_SEGMENT: name = "PROFILING_SEGMENT"; break;
   case SAT::tEntryID::TYPES_DATABASE: name = "TYPES_DATABASE"; break;
   case SAT::tEntryID::PAGE_DESCRIPTOR: name = "PAGE_DESCRIPTOR"; break;
 
@@ -276,7 +275,7 @@ void SAT::Controller::printSegments() {
   //g_SAT.segments_allocator.traverse();
 }
 
-IProfile* SAT::Controller::createProfile() {
+IStackProfiler* SAT::Controller::createStackProfiler() {
   return new(this->allocBuffer(sizeof(SATProfile))) SATProfile();
 }
 

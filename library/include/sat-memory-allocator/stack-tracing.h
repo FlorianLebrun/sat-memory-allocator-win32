@@ -42,6 +42,15 @@ namespace SAT {
   };
   static_assert(sizeof(StackMarker) == 4*sizeof(uint64_t), "StackMarker size invalid");
 
+  template <class tData>
+  struct StackNode {
+    StackNode* next;
+    StackNode* parent;
+    StackNode* children;
+    SAT::StackMarker marker;
+    tData data;
+  };
+
   struct StackBeacon {
     StackBeacon *parentBeacon;
     virtual void createrMarker(StackMarker& buffer) = 0;
@@ -81,6 +90,29 @@ namespace SAT {
 
   struct IStackVisitor {
     virtual void visit(StackMarker& marker) = 0;
+  };
+
+  /**************************************************
+  ** Stack profiling
+  **************************************************/
+
+  struct IStackProfiling : public IReleasable {
+
+    struct tData {
+      int hits;
+      tData() : hits(0) {}
+    };
+
+    typedef SAT::StackNode<tData>* Node;
+
+    virtual Node getRoot() = 0;
+    virtual void print() = 0;
+  };
+
+  struct IStackProfiler : IReleasable {
+    virtual IStackProfiling* flushProfiling() = 0;
+    virtual void startProfiling(IThread* thread) = 0;
+    virtual void stopProfiling() = 0;
   };
 
   /**************************************************

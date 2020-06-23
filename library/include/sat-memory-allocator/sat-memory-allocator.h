@@ -40,8 +40,7 @@ namespace SAT {
 }
 
 #include "./types.h"
-#include "./tracing.h"
-#include "./profile.h"
+#include "./stack-tracing.h"
 #include "./sat.h"
 
 extern"C" void _satmalloc_init();

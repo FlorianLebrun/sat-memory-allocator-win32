@@ -7,8 +7,12 @@ append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES "./")
 add_executable(${target} WIN32 ${files})
 add_dependencies(${target} sat-memory-allocator)
 set_target_properties(${target} PROPERTIES FOLDER "Test")
-set_project_exe_properties(${target})
 
 # Set link properties
 target_link_libraries(${target} PRIVATE sat-memory-allocator)
 target_link_options(${target} PRIVATE /SUBSYSTEM:CONSOLE)
+
+# Setting for development comfort
+if(DEVMODE AND SATMEM_POST_BUILD_DIRS)
+set_target_postbuild_copy(${target} TO ${SATMEM_POST_BUILD_DIRS})
+endif()

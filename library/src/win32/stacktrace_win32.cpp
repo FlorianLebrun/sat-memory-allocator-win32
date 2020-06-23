@@ -115,7 +115,6 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
   }
   else {
     RtlCaptureContext(&context);
-    return 0;
   }
 
   // Initiate markers stack
@@ -142,6 +141,8 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
     cs.Start();
     DWORD64 ImageBase, BaseAddress, InsAddress;
     PRUNTIME_FUNCTION pFunctionEntry = ::RtlLookupFunctionEntry(context.Rip, &ImageBase, NULL);
+    delta.unwind_lookup_time += cs.GetDiffDouble(Chrono::US);
+    cs.Start();
     if(pFunctionEntry) {
       PVOID HandlerData;
       DWORD64 EstablisherFrame;
@@ -162,7 +163,7 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
       context.Rip = (ULONG64)(*(PULONG64)context.Rsp);
       context.Rsp += 8;
     }
-    delta.unwind_lookup_time += cs.GetDiffDouble(Chrono::US);
+    delta.unwind_move_time += cs.GetDiffDouble(Chrono::US);
 
     // Add marker for stackframe, when not under a stack beacon
     if(!currentBeacon) {
@@ -194,7 +195,7 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
   delta.total_time = ct.GetDiffDouble(Chrono::US);
 
   times.add(delta);
-  if(times.count > 10000) {
+  if(times.count > 1000) {
     times.print();
     times.reset();
   }

@@ -15,10 +15,8 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIE
   "./heaps/Compact"
 
   "./controller"
-  "./controller/connector"
-  "./controller/profiler"
-  "./controller/threads"
-
+  "./threads"
+  "./profiling"
   "./types"
   "./utils"
 
@@ -26,8 +24,8 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIE
   "./win32"
   "./win32/patcher"
 )
-append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" DIRECTORIES 
-  "./include/sat-memory-allocator"
+append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES 
+  "./sat-memory-allocator"
 )
 
 # Add linker def file

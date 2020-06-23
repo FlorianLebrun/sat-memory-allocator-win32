@@ -26,12 +26,8 @@ namespace SAT {
       FREE, // Available segment
       FORBIDDEN, // Forbidden segment (not reservable by allocator)
 
-      // Tracing page
-      STREAM_SEGMENT, // Segment for sampling stream
-      STACKSTAMP_DATABASE, // Segment for stackstamp tracing
-      MARKING_DATABASE, // Segment for marking
-
       // Other page
+      PROFILING_SEGMENT, // Segment for profiling
       TYPES_DATABASE,
       PAGE_DESCRIPTOR,
 
@@ -75,6 +71,15 @@ namespace SAT {
     }
   } *tpForbiddenEntry;
 
+  typedef struct tProfilingSegmentEntry {
+    uint8_t id; // = PROFILING_SEGMENT
+    uint64_t profilingID; // Number representing the profiling
+    void set(uint64_t profilingID = 0) {
+      this->id = tEntryID::PROFILING_SEGMENT;
+      this->profilingID = profilingID;
+    }
+  } *tpProfilingSegmentEntry;
+
   typedef struct tHeapSegmentEntry {
     uint8_t id;
     uint8_t heapID;
@@ -99,10 +104,10 @@ namespace SAT {
     union {
       tDescriptorEntry SATDescriptor;
       tSegmentEntry SATSegment;
+      tProfilingSegmentEntry profilingSegment;
       tHeapSegmentEntry heapSegment;
       tFreeEntry free;
       tForbiddenEntry forbidden;
-
       struct {
         uint8_t id;
         uint8_t bytes[31];

@@ -4,8 +4,9 @@
 #ifndef SAT_descriptor_h_
 #define SAT_descriptor_h_
 
-#include "./stack-stamp.h"
-#include "./profiler/index.h"
+#include "./scheduler.h"
+#include "../profiling/stack-stamp.h"
+#include "../profiling/stack-profiler.h"
 #include "./segments-allocator.h"
 
 namespace SAT {
@@ -30,7 +31,7 @@ namespace SAT {
     bool enableObjectTimeTracing;
 
     StackStampDatabase* stackStampDatabase;
-    SATSampler sampler;
+    SATScheduler scheduler;
 
     uint64_t timeOrigin;
     uint64_t timeFrequency;
@@ -62,7 +63,7 @@ namespace SAT {
     virtual SAT::IThread* configureCurrentThread(const char* name, int heapId) override final;
 
     // Analysis
-    virtual IProfile* createProfile() override final;
+    virtual IStackProfiler* createStackProfiler() override final;
     virtual void traverseObjects(SAT::IObjectVisitor* visitor, uintptr_t target_address) override final;
     virtual void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) override final;
     virtual bool checkObjectsOverflow() override final;
