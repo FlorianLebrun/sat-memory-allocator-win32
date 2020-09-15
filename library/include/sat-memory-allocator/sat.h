@@ -37,7 +37,7 @@ namespace SAT {
     }
   } *tpObjectMetaData;
   static_assert(sizeof(tObjectMetaData) == sizeof(uint64_t), "tObjectMetaData bad size");
-
+  
   typedef struct tObjectInfos {
     uint8_t heapID;
     size_t size;
@@ -51,9 +51,14 @@ namespace SAT {
       this->size = size;
       return *this;
     }
+    tpObjectStamp getStamp() {
+       if (!this->meta->isStamped) return 0;
+       else return tpObjectStamp(this->base + this->size - sizeof(tObjectStamp));
+    }
     void* detectOverflow() {
       if(this->meta && this->meta->isOverflowProtected) {
         uint32_t paddingEnd = this->size-sizeof(uint32_t);
+        if (this->meta->isStamped) paddingEnd -= sizeof(tObjectStamp);
 
         // Read and check padding size
         uint32_t* pBufferSize = (uint32_t*)(this->base+paddingEnd);

@@ -54,16 +54,28 @@ void* BaseHeap::allocateWithMeta(size_t size, uint64_t meta)
 {
 #if UseOverflowProtection
   static const size_t paddingMinSize = 8;
-  SAT::IObjectAllocator* allocator = this->sizeMappingWithMeta.getAllocator(size+paddingMinSize);
-  void* ptr = allocator->allocateWithMeta(size+paddingMinSize, meta|tObjectMetaData::cIsOverflowProtected_Bit);
+  size_t allocatedSize = size + paddingMinSize + sizeof(tObjectStamp);
+  meta |= tObjectMetaData::cIsOverflowProtected_Bit | tObjectMetaData::cIsStamped_Bit;
 
-  // Write overflow detection bytes
-  size_t allocatedSize = allocator->getAllocatedSizeWithMeta(size);
-  uint32_t& bufferSize = *(uint32_t*)(((uint8_t*)ptr)+allocatedSize-sizeof(uint32_t));
-  bufferSize = size^0xabababab;
-  uint8_t* paddingBytes = ((uint8_t*)ptr)+size;
-  memset(paddingBytes, 0xab, allocatedSize-size-sizeof(uint32_t));
+  // Allocate buffer
+  SAT::IObjectAllocator* allocator = this->sizeMappingWithMeta.getAllocator(allocatedSize);
+  void* ptr = allocator->allocateWithMeta(allocatedSize, meta);
 
+  // Prepare buffer tail
+  {
+     allocatedSize = allocator->getAllocatedSizeWithMeta(allocatedSize);
+
+     // Write stamp
+     tpObjectStamp stamp = tpObjectStamp(((uint8_t*)ptr) + allocatedSize - sizeof(tObjectStamp));
+     stamp->stackstamp = 0;
+     stamp->timestamp = g_SAT.getCurrentTimestamp();
+
+     // Write overflow detection bytes
+     uint32_t& bufferSize = *(uint32_t*)(((uint8_t*)ptr) + allocatedSize - sizeof(uint32_t) - sizeof(tObjectStamp));
+     bufferSize = size ^ 0xabababab;
+     uint8_t* paddingBytes = ((uint8_t*)ptr) + size;
+     memset(paddingBytes, 0xab, allocatedSize - size - sizeof(uint32_t) - sizeof(tObjectStamp));
+  }
 #else
   SAT::IObjectAllocator* allocator = this->sizeMappingWithMeta.getAllocator(size);
   void* ptr = allocator->allocateWithMeta(size, meta);
