@@ -2,6 +2,8 @@
 #error "bad include"
 #endif
 
+#include <vector>
+
 namespace SAT {
   typedef uint32_t TypeDefID;
   typedef struct tTypeDef *TypeDef;

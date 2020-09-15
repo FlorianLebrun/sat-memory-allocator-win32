@@ -2,46 +2,11 @@
 #ifndef _sat_memory_allocator_win32_h_
 #define _sat_memory_allocator_win32_h_
 
-#include <atomic>
-#include <string>
-#include <vector>
-#include <stdint.h>
-#include <assert.h>
-
-namespace SAT {
-  struct IThread;
-  struct IHeap;
-  struct IController;
-
-  typedef struct tEntry *tpEntry;
-  typedef struct tObjectInfos *tpObjectInfos;
-  typedef struct IMark *Mark;
-
-  const uintptr_t cSegmentSizeL2 = 16;
-  const uintptr_t cSegmentSize = 1 << cSegmentSizeL2;
-  const uintptr_t cSegmentOffsetMask = (1 << cSegmentSizeL2) - 1;
-  const uintptr_t cSegmentPtrMask = ~cSegmentOffsetMask;
-  const uintptr_t cSegmentMinIndex = 32;
-  const uintptr_t cSegmentMinAddress = cSegmentMinIndex << cSegmentSizeL2;
-
-  const uintptr_t cEntrySizeL2 = 5;
-  const uintptr_t cEntrySize = 1 << cEntrySizeL2;
-
-  typedef void* (*tp_malloc)(size_t size);
-  typedef void* (*tp_realloc)(void* ptr, size_t size);
-  typedef size_t (*tp_msize)(void* ptr);
-  typedef void (*tp_free)(void*);
-
-  struct IReleasable {
-    virtual void retain() = 0;
-    virtual void release() = 0;
-  };
-
-}
-
-#include "./types.h"
-#include "./stack-tracing.h"
-#include "./sat.h"
+#include "./_base.h"
+#include "./_types.h"
+#include "./_stack-tracing.h"
+#include "./_objects.h"
+#include "./_system.h"
 
 extern"C" void _satmalloc_init();
 
