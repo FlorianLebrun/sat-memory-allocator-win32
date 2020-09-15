@@ -22,3 +22,4 @@ sat_current_thread
 
 sat_begin_stack_beacon
 sat_end_stack_beacon
+sat_print_stackstamp

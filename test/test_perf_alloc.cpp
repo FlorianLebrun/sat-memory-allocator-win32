@@ -152,7 +152,6 @@ struct tTest {
   {
     SAT::IController* sat = sat_get_contoller();
     SAT::IThread* thread = sat->getCurrentThread();
-    SAT::Mark mark;
 
     this->test_sat_malloc_2();
     Sleep(50);

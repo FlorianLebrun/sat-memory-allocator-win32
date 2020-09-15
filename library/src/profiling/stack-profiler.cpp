@@ -26,7 +26,7 @@ SATProfile::SATProfile() {
 }
 
 void SATProfile::execute() {
-  if (auto node = this->profiling->manifold.getStackNode(this->target, 0)) {
+  if (auto node = this->profiling->manifold.getStackNode(this->target)) {
     node->data.hits++;
     this->lastSampleTime = g_SAT.getCurrentTimestamp();
   }

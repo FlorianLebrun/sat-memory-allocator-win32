@@ -180,14 +180,14 @@ SAT::IThread* sat_current_thread() {
 void sat_begin_stack_beacon(SAT::StackBeacon* beacon) {
   SAT::Thread* thread = SAT::current_thread;
   if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
-  if(thread->beaconsCount < SAT::cThreadMaxStackBeacons) {
-    if(thread->beaconsCount == 0) {
+  if(thread->stackBeaconsCount < SAT::cThreadMaxStackBeacons) {
+    if(thread->stackBeaconsCount == 0) {
       beacon->parentBeacon = 0;
-      thread->beacons[thread->beaconsCount++] = beacon;
+      thread->stackBeacons[thread->stackBeaconsCount++] = beacon;
     }
     else {
-      beacon->parentBeacon = thread->beacons[thread->beaconsCount-1];
-      thread->beacons[thread->beaconsCount++] = beacon;
+      beacon->parentBeacon = thread->stackBeacons[thread->stackBeaconsCount-1];
+      thread->stackBeacons[thread->stackBeaconsCount++] = beacon;
     }
   }
 }
@@ -195,15 +195,26 @@ void sat_begin_stack_beacon(SAT::StackBeacon* beacon) {
 void sat_end_stack_beacon(SAT::StackBeacon* beacon) {
   SAT::Thread* thread = SAT::current_thread;
   if (!thread) thread = (SAT::Thread*)g_SAT.getCurrentThread();
-  while(thread->beaconsCount && uintptr_t(thread->beacons[thread->beaconsCount-1])<uintptr_t(beacon)) {
-    thread->beaconsCount--;
+  while(thread->stackBeaconsCount && uintptr_t(thread->stackBeacons[thread->stackBeaconsCount-1])<uintptr_t(beacon)) {
+    thread->stackBeaconsCount--;
     printf("Error in SAT stack beaon: a previous beacon has been not closed.\n");
   }
-  if(thread->beaconsCount && thread->beacons[thread->beaconsCount-1] == beacon) {
-    thread->beaconsCount--;
+  if(thread->stackBeaconsCount && thread->stackBeacons[thread->stackBeaconsCount-1] == beacon) {
+    thread->stackBeaconsCount--;
     beacon->parentBeacon = 0;
   }
-  else if(thread->beaconsCount != SAT::cThreadMaxStackBeacons) {
+  else if(thread->stackBeaconsCount != SAT::cThreadMaxStackBeacons) {
     printf("Error in SAT stack beaon: a beacon is not retrieved and cannot be properly closed.\n");
   }
+}
+
+void sat_print_stackstamp(uint64_t stackstamp) {
+   struct Visitor: public SAT::IStackVisitor {
+      virtual void visit(SAT::StackMarker& marker) override {
+         char symbol[1024];
+         marker.getSymbol(symbol, sizeof(symbol));
+         printf("* %s\n", symbol);
+      }
+   } visitor;
+   g_SAT.traverseStack(stackstamp, &visitor);
 }

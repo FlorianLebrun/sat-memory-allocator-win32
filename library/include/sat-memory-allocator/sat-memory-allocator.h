@@ -4,7 +4,7 @@
 
 #include "./_base.h"
 #include "./_types.h"
-#include "./_stack-tracing.h"
+#include "./_stack_analysis.h"
 #include "./_objects.h"
 #include "./_system.h"
 
@@ -22,6 +22,7 @@ extern"C" void sat_flush_cache();
 // Stack marking API
 extern"C" void sat_begin_stack_beacon(SAT::StackBeacon* beacon);
 extern"C" void sat_end_stack_beacon(SAT::StackBeacon* beacon);
+extern"C" void sat_print_stackstamp(uint64_t stackstamp);
 
 // Reflexion API
 extern"C" SAT::IController* sat_get_contoller();

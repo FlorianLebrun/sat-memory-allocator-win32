@@ -17,7 +17,6 @@ namespace SAT {
 
       // Stack Analysis
       virtual uint64_t getStackStamp() = 0;
-      virtual void setStackAnalyzer(IStackStampAnalyzer* stack_analyzer) = 0;
    };
 
    struct IHeap : IReleasable, IObjectAllocator {

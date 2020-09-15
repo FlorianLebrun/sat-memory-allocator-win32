@@ -4,6 +4,8 @@
 #ifndef _SAT_threads_index_h_
 #define _SAT_threads_index_h_
 
+#include "./thread-stack-tracker.h"
+
 namespace SAT {
 
   const int cThreadMaxStackBeacons = 1024;
@@ -11,7 +13,6 @@ namespace SAT {
   struct Thread : public SATBasicRealeasable<IThread> {
   private:
     char name[256];
-
   public:
     Thread* backThread,* nextThread;
     SystemThreading::tThread handle;
@@ -21,10 +22,9 @@ namespace SAT {
     LocalHeap* local_heap;
     GlobalHeap* global_heap;
 
-    bool isSampled;
-    IStackStampAnalyzer* stack_analyzer;
-    StackBeacon* beacons[cThreadMaxStackBeacons];
-    int beaconsCount;
+    ThreadStackTracker stackTracker;
+    StackBeacon* stackBeacons[cThreadMaxStackBeacons];
+    int stackBeaconsCount;
 
     Thread(const char* name, uint64_t threadId, int heapId);
 
@@ -33,12 +33,11 @@ namespace SAT {
     virtual bool setName(const char*) override;
 
     virtual uint64_t getStackStamp() override;
-    virtual void setStackAnalyzer(IStackStampAnalyzer* stack_analyzer) override;
 
     virtual void destroy() override;
 
     uint64_t CaptureThreadCpuTime();
-    bool CaptureThreadStackStamp(SAT::IStackStampBuilder& stack_builder, SAT::IStackStampAnalyzer* stack_analyzer);
+    bool CaptureThreadStackStamp(SAT::IStackStampBuilder& stack_builder);
   };
 }
 

@@ -106,10 +106,6 @@ namespace SAT {
       virtual void push(SAT::StackMarker& marker) = 0;
    };
 
-   struct IStackStampAnalyzer {
-      virtual bool analyze(IStackStampBuilder& builder, StackBeacon* stack, int stackLen) = 0;
-   };
-
    struct IStackVisitor {
       virtual void visit(StackMarker& marker) = 0;
    };
@@ -132,10 +128,5 @@ namespace SAT {
       virtual void startProfiling(IThread* thread) = 0;
       virtual void stopProfiling() = 0;
    };
-
-   /**************************************************
-   ** Object tracing
-   **************************************************/
-
 
 }

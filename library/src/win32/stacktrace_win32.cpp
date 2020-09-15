@@ -80,7 +80,7 @@ struct tTimes {
   }
 };
 
-__declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampBuilder& stack_builder, SAT::IStackStampAnalyzer* stack_analyzer) {
+__declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampBuilder& stack_builder) {
   const int maxStackFrames = 1024;
   char _frames_buffer[sizeof(SAT::StackMarker)*maxStackFrames];
   bool useCompactMarker = true;
@@ -119,7 +119,7 @@ __declspec(noinline) bool SAT::Thread::CaptureThreadStackStamp(SAT::IStackStampB
 
   // Initiate markers stack
   int markerCount = 0;
-  SAT::StackBeacon* currentBeacon = beaconsCount?this->beacons[beaconsCount-1]:0;
+  SAT::StackBeacon* currentBeacon = this->stackBeaconsCount?this->stackBeacons[stackBeaconsCount-1]:0;
   SAT::StackMarker* markers = (SAT::StackMarker*)&_frames_buffer[sizeof(SAT::StackMarker)*maxStackFrames];
 
   // Unwinds stackframes and stack beacons

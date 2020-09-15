@@ -40,7 +40,7 @@ public:
     this->root.lock.SpinLock::SpinLock();
   }
 
-  Node getStackNode(SAT::Thread* thread, SAT::IStackStampAnalyzer* stack_analyzer) {
+  Node getStackNode(SAT::Thread* thread) {
     struct StackStampBuilder : SAT::IStackStampBuilder {
       SATStackNodeManifold<tData>* manifold;
       Node tos;
@@ -49,19 +49,62 @@ public:
         this->tos = &manifold->root;
       }
       virtual void push(SAT::StackMarker& marker) override {
-        this->tos = this->manifold->map(marker, this->tos);
+        this->tos = this->manifold->addMarkerInto(marker, this->tos);
       }
       Node flush() {
         return this->tos;
       }
     };
     StackStampBuilder stack_builder(this);
-    if (thread->CaptureThreadStackStamp(stack_builder, stack_analyzer)) {
+    if (thread->CaptureThreadStackStamp(stack_builder)) {
       return stack_builder.flush();
     }
     else {
       return 0;
     }
+  }
+
+  Node addMarkerInto(SAT::StackMarker& marker, Node parent) {
+     for (;;) {
+        Node lastNode = Node(parent->children);
+        for (Node node = lastNode; node; node = Node(lastNode->next)) {
+           lastNode = node;
+           if (node->marker.compare(marker) == 0) {
+              return node;
+           }
+        }
+
+        if (lastNode) {
+           lastNode->lock.lock();
+           if (!lastNode->next) {
+              Node node = (Node)this->allocBuffer(sizeof(tNode));
+              node->tNode::tNode();
+              node->next = 0;
+              node->children = 0;
+              node->parent = parent;
+              node->marker.copy(marker);
+              lastNode->next = node;
+              lastNode->lock.unlock();
+              return node;
+           }
+           else lastNode->lock.unlock();
+        }
+        else {
+           parent->lock.lock();
+           if (!parent->children) {
+              Node node = (Node)this->allocBuffer(sizeof(tNode));
+              node->tNode::tNode();
+              node->next = 0;
+              node->children = 0;
+              node->parent = parent;
+              node->marker.copy(marker);
+              parent->children = node;
+              parent->lock.unlock();
+              return node;
+           }
+           else parent->lock.unlock();
+        }
+     }
   }
 
 private:
@@ -89,49 +132,6 @@ private:
     return ptr;
   }
 
-  Node map(SAT::StackMarker& marker, Node parent) {
-    for (;;) {
-      Node lastNode = Node(parent->children);
-      for (Node node = lastNode; node; node = Node(lastNode->next)) {
-        lastNode = node;
-        if (node->marker.compare(marker) == 0) {
-          return node;
-        }
-      }
-
-      if (lastNode) {
-        lastNode->lock.lock();
-        if (!lastNode->next) {
-          Node node = (Node)this->allocBuffer(sizeof(tNode));
-          node->tNode::tNode();
-          node->next = 0;
-          node->children = 0;
-          node->parent = parent;
-          node->marker.copy(marker);
-          lastNode->next = node;
-          lastNode->lock.unlock();
-          return node;
-        }
-        else lastNode->lock.unlock();
-      }
-      else {
-        parent->lock.lock();
-        if (!parent->children) {
-          Node node = (Node)this->allocBuffer(sizeof(tNode));
-          node->tNode::tNode();
-          node->next = 0;
-          node->children = 0;
-          node->parent = parent;
-          node->marker.copy(marker);
-          parent->children = node;
-          parent->lock.unlock();
-          return node;
-        }
-        else parent->lock.unlock();
-      }
-    }
-  }
-
 };
 
 struct StackStampDatabase {
@@ -145,9 +145,6 @@ struct StackStampDatabase {
   StackStampDatabase(uintptr_t firstSegmentBuffer = 0)
     : manifold(firstSegmentBuffer)
   {
-  }
-  uint64_t getStackStamp(SAT::Thread* thread, SAT::IStackStampAnalyzer* stack_analyzer) {
-    return uint64_t(this->manifold.getStackNode(thread, stack_analyzer));
   }
   void traverseStack(uint64_t stackstamp, SAT::IStackVisitor* visitor) {
     for (auto node = StackStampNode(stackstamp); node; node = node->parent) {
