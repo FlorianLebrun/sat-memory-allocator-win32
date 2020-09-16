@@ -16,8 +16,6 @@ int main() {
    //test_btree();
    test_stack_analysis();
 
-   printf("> done.\n");
    fflush(stdout);
-   system("pause");
    return 0;
 }

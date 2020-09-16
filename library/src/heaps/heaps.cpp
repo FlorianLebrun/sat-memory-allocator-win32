@@ -67,7 +67,7 @@ void* BaseHeap::allocateWithMeta(size_t size, uint64_t meta)
 
      // Write stamp
      tpObjectStamp stamp = tpObjectStamp(((uint8_t*)ptr) + allocatedSize - sizeof(tObjectStamp));
-     stamp->stackstamp = 0;
+     stamp->stackstamp =  sat_current_thread()->getStackStamp();
      stamp->timestamp = g_SAT.getCurrentTimestamp();
 
      // Write overflow detection bytes

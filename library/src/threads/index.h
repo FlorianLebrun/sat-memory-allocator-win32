@@ -23,8 +23,9 @@ namespace SAT {
     GlobalHeap* global_heap;
 
     ThreadStackTracker stackTracker;
-    StackBeacon* stackBeacons[cThreadMaxStackBeacons];
-    int stackBeaconsCount;
+    StackBeacon* stackBeaconsBase[cThreadMaxStackBeacons];
+    StackBeacon** stackBeacons;
+    uint64_t stackLastId;
 
     Thread(const char* name, uint64_t threadId, int heapId);
 

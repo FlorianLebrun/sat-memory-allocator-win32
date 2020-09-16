@@ -42,7 +42,7 @@ namespace SAT {
       virtual IHeap* getHeap(int id) = 0;
 
       // Analysis
-      virtual IStackProfiler* createStackProfiler() = 0;
+      virtual IStackProfiler* createStackProfiler(IThread* thread) = 0;
       virtual void traverseObjects(IObjectVisitor* visitor, uintptr_t start_address = 0) = 0;
       virtual void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) = 0;
       virtual bool checkObjectsOverflow() = 0;

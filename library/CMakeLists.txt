@@ -28,6 +28,8 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" GROUP "Include" ROOT ".
   "./sat-memory-allocator"
 )
 
+LIST(APPEND files ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/llcode.x64.asm)
+
 # Add linker def file
 list(APPEND files ${CMAKE_CURRENT_SOURCE_DIR}/library.def)
 

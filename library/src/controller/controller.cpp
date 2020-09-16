@@ -175,7 +175,7 @@ void SAT::Controller::initialize() {
   }
 
   // Create stackstamp database
-  this->stackStampDatabase = createStackStampDatabase();
+  this->stackStampDatabase = StackStampDatabase::create();
 
   // Create types database
   SAT::TypesDataBase_init();
@@ -275,8 +275,8 @@ void SAT::Controller::printSegments() {
   //g_SAT.segments_allocator.traverse();
 }
 
-IStackProfiler* SAT::Controller::createStackProfiler() {
-  return new(this->allocBuffer(sizeof(SATProfile))) SATProfile();
+IStackProfiler* SAT::Controller::createStackProfiler(IThread* thread) {
+  return new(this->allocBuffer(sizeof(ThreadStackProfiler))) ThreadStackProfiler((Thread*)thread);
 }
 
 double SAT::Controller::getCurrentTime() {

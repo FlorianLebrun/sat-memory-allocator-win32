@@ -63,7 +63,7 @@ namespace SAT {
     virtual SAT::IThread* configureCurrentThread(const char* name, int heapId) override final;
 
     // Analysis
-    virtual IStackProfiler* createStackProfiler() override final;
+    virtual IStackProfiler* createStackProfiler(IThread* thread) override final;
     virtual void traverseObjects(SAT::IObjectVisitor* visitor, uintptr_t target_address) override final;
     virtual void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) override final;
     virtual bool checkObjectsOverflow() override final;

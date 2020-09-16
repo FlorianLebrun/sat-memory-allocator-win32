@@ -2,7 +2,7 @@
 
 using namespace SAT;
 
-Thread::Thread(const char* name, uint64_t threadId, int heapId) {
+Thread::Thread(const char* name, uint64_t threadId, int heapId) : stackTracker(this) {
    assert(!SAT::current_thread);
 
    // Get global heap
@@ -18,7 +18,9 @@ Thread::Thread(const char* name, uint64_t threadId, int heapId) {
    this->local_heap = heap->createLocal();
 
    // Init stack tools
-   this->stackBeaconsCount = 0;
+   this->stackLastId = 2;
+   this->stackBeacons = &this->stackBeaconsBase[cThreadMaxStackBeacons-1];
+   this->stackBeacons[0] = 0;
 
    // Map to TLS
    SAT::current_thread = this;

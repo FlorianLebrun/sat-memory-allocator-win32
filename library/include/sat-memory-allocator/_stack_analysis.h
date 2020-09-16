@@ -57,7 +57,8 @@ namespace SAT {
    //-----------------------------------------------------------------------------
 
    struct StackBeacon {
-      StackBeacon* parentBeacon;
+      uint64_t beaconId;
+      virtual bool isSpan() { return false; }
       virtual void createrMarker(StackMarker& buffer) = 0;
    };
 
@@ -125,7 +126,7 @@ namespace SAT {
 
    struct IStackProfiler : IReleasable {
       virtual IStackProfiling* flushProfiling() = 0;
-      virtual void startProfiling(IThread* thread) = 0;
+      virtual void startProfiling() = 0;
       virtual void stopProfiling() = 0;
    };
 
