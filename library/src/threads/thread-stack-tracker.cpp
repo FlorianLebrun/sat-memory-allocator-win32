@@ -13,6 +13,24 @@
 
 extern"C" uintptr_t __fastcall getRbpX64Proc();
 
+static bool ReadThreadContext(HANDLE hThread, CONTEXT& context) {
+   extern std::atomic<intptr_t> _windows_loader_working;
+
+   // Prevent loader deadlock
+   if (_windows_loader_working.load()) {
+      //printf("'Windows Loader Working' thread analysis is unsafe\n");
+      return false;
+   }
+
+   // Read thread context
+   if (::GetThreadContext(hThread, &context) == 0) {
+      printf("'GetThreadContext' has failed\n");
+      return false;
+   }
+   return true;
+}
+
+
 namespace SAT {
 
    struct ThreadStackContext {
@@ -89,7 +107,6 @@ namespace SAT {
          }
 
          // Read thread context
-         extern bool ReadThreadContext(HANDLE hThread, CONTEXT & context);
          if (!ReadThreadContext(hThread, this->context)) {
             ::ResumeThread(hThread);
             return false;

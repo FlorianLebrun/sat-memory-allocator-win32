@@ -92,32 +92,6 @@ void* BaseHeap::allocateWithMeta(size_t size, uint64_t meta)
   return ptr;
 }
 
-/*void* BaseHeap::allocTraced(size_t size, uint64_t meta) {
-SAT::IObjectAllocator* allocator;
-void* ptr;
-
-// Trace object allocation
-if (g_SAT.enableObjectStackTracing) {
-size += sizeof(uint64_t) + sizeof(SAT::tObjectStamp);
-meta |= SAT::tObjectMetaData::cIsStamped_Bit;
-
-allocator = sizeMapping.getAllocator(size);
-assert(size <= allocator->getMaxAllocatedSize());
-
-SAT::tpObjectStamp stamp = SAT::tpObjectStamp(allocator->allocObject(size, meta));
-stamp[0] = tObjectStamp(g_SAT.getCurrentTimestamp(), SAT::current_thread->getStackStamp());
-ptr = &stamp[1];
-}
-else {
-if (meta) size += sizeof(uint64_t);
-allocator = sizeMapping.getAllocator(size);
-assert(size <= allocator->getMaxAllocatedSize());
-ptr = allocator->allocObject(size, meta);
-}
-
-return ptr;
-}*/
-
 GlobalHeap::GlobalHeap(const char* name) {
   this->id = id;
   this->locals_list = 0;

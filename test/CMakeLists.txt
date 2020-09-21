@@ -5,7 +5,6 @@ append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES "./")
 
 # Create library
 add_executable(${target} WIN32 ${files})
-add_dependencies(${target} sat-memory-allocator)
 set_target_properties(${target} PROPERTIES FOLDER "Test")
 
 # Set link properties

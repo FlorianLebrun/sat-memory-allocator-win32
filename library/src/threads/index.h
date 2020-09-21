@@ -38,7 +38,6 @@ namespace SAT {
     virtual void destroy() override;
 
     uint64_t CaptureThreadCpuTime();
-    bool CaptureThreadStackStamp(SAT::IStackStampBuilder& stack_builder);
   };
 }
 
