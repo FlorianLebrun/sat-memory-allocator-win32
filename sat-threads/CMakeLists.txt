@@ -1,0 +1,17 @@
+set(target sat-threads)
+
+# Collect source files
+append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES 
+  "./include/${target}"
+  "./src"
+  "./src/worker"
+)
+
+# Create library
+add_library(${target} STATIC ${files})
+set_target_properties(${target} PROPERTIES FOLDER "Libs")
+
+# Set compile properties
+target_include_directories(${target} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_link_libraries(${target} PRIVATE boost)

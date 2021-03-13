@@ -1,0 +1,25 @@
+set(target sat-memory)
+
+# Collect source files
+append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIES 
+  "./"
+  "./utils"
+
+  # Win32 specific
+  "./win32"
+)
+append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES 
+  "./sat-memory"
+)
+
+# Source includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Create library
+add_library(${target} STATIC ${files})
+set_target_properties(${target} PROPERTIES FOLDER "Libs")
+
+# Set compile properties
+target_include_directories(${target} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_link_libraries(${target} PUBLIC sat-threads)

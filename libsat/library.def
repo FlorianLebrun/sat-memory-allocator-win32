@@ -1,0 +1,25 @@
+LIBRARY sat-memory-allocator
+EXPORTS
+
+_satmalloc_init
+
+sat_malloc
+sat_realloc
+sat_calloc
+sat_malloc_ex
+sat_msize
+sat_free
+sat_flush_cache
+
+sat_get_table
+sat_get_contoller
+sat_get_types_controller
+sat_get_address_infos
+sat_has_address
+sat_types_base
+
+sat_current_thread
+
+sat_begin_stack_beacon
+sat_end_stack_beacon
+sat_print_stackstamp

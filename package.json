@@ -1,5 +1,10 @@
 {
+	"name": "sat-memory-allocator",
+	"version": "0.0.0",
+	"description": "Memory allocator for c++",
+	"repository": "https://github.com/FlorianLebrun/sat-memory-allocator.git",
+	"license": "MIT",
 	"dependencies": {
-		"tools": "../../../cmake-tools"
+		"script.cmake": "https://github.com/FlorianLebrun/script.cmake.git"
 	}
 }

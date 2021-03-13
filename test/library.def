@@ -1,3 +1,0 @@
-LIBRARY test_dll
-EXPORTS
-test_sat_connect
