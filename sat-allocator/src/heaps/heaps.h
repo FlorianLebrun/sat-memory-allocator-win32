@@ -1,7 +1,8 @@
 #pragma once
-#include <sat-memory-allocator/sat-memory-allocator.h>
+#include <sat-memory-allocator/allocator.h>
 #include <sat-threads/spinlock.hpp>
 #include "./AllocatorSizeMapping.h"
+#include "../table.h"
 
 #ifdef _DEBUG
 #define SAT_DEBUG_CHECK(x)// x

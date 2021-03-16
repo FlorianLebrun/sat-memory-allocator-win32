@@ -1,4 +1,5 @@
 #include "./stack-profiler.h"
+#include <sat-threads/timing.hpp>
 
 namespace sat {
 
@@ -7,9 +8,8 @@ namespace sat {
    {
    }
    StackProfiling* StackProfiling::create() {
-      StackProfiling* profiling;
-      size_t size;
-      profiling = (StackProfiling*)LargeAllocator::allocator.allocateSegment(size);
+      uintptr_t index = memory::table->allocSegmentSpan(1);
+      StackProfiling* profiling = (StackProfiling*)(index << memory::cSegmentSizeL2);
       profiling->StackProfiling::StackProfiling();
       return profiling;
    }
@@ -71,7 +71,7 @@ namespace sat {
          }
 
          node->data.hits++;
-         this->lastSampleTime = g_SAT.getCurrentTimestamp();
+         this->lastSampleTime = sat::timing::getCurrentTimestamp();
       });
    }
 
@@ -97,7 +97,7 @@ namespace sat {
 
    ThreadStackProfiler::~ThreadStackProfiler() {
       sat::removeTickWorker(this);
-      g_SAT.freeBuffer(this, sizeof(*this));
+      memory::table->freeBuffer(this, sizeof(*this));
    }
 
 }

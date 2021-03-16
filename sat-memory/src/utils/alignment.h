@@ -1,5 +1,4 @@
 #pragma once
-#include "./bitwise.h"
 
 template<int alignment, typename T>
 inline T align(T offset) {return ((-offset)&(alignment-1))+offset;}

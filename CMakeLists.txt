@@ -24,7 +24,7 @@ add_subdirectory("./sat-memory")
 add_subdirectory("./sat-allocator")
 add_subdirectory("./sat-stack-analysis")
 add_subdirectory("./sat-threads")
-#add_subdirectory("./libsat")
+add_subdirectory("./libsat")
 
 # Add tests projects
 add_subdirectory("./sat-memory/test")

@@ -1,5 +1,6 @@
 #pragma once
-#include "../utils/binary-arithmetic.h"
+#include "../utils/alignment.h"
+#include "../utils/bitwise.h"
 
 namespace sat {
 

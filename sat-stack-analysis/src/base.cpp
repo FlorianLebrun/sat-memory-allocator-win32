@@ -1,9 +1,16 @@
 #include <sat-memory-allocator/stack_analysis.h>
+#include <sat-memory-allocator/allocator.h>
+#include "./stack-stamp.h"
 #include "./thread-stack-tracker.h"
 
 __forceinline sat::ThreadStackTracker* getCurrentStackTracker() {
    sat::Thread* thread = sat::Thread::current();
-   return thread->getObject<sat::ThreadStackTracker>();
+   auto tracker = thread->getObject<sat::ThreadStackTracker>();
+   if (!tracker) {
+      tracker = new sat::ThreadStackTracker(thread);
+      thread->setObject<sat::ThreadStackTracker>(tracker);
+   }
+   return tracker;
 }
 
 void sat_begin_stack_beacon(sat::StackBeacon* beacon) {
@@ -39,5 +46,14 @@ void sat_print_stackstamp(uint64_t stackstamp) {
          printf("* %s\n", symbol);
       }
    } visitor;
-   g_SAT.traverseStack(stackstamp, &visitor);
+   sat::getStackStampDatabase()->traverseStack(stackstamp, &visitor);
+}
+
+namespace sat {
+   namespace analysis {
+      uint64_t getCurrentStackStamp() {
+         auto tracker = getCurrentStackTracker();
+         return tracker->getStackStamp();
+      }
+   }
 }

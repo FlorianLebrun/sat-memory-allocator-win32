@@ -3,6 +3,8 @@
 #include <sat-threads/spinlock.hpp>
 #include <boost/thread.hpp>
 
+#include <sat-memory/memory.hpp>
+
 namespace sat {
    namespace impl {
 
@@ -16,11 +18,8 @@ namespace sat {
          BasicThreadPool* pool;
          boost::thread thread;
          BasicThread(BasicThreadPool* pool, std::function<void()>&& entrypoint);
-         virtual std::thread::id getID() final {
-            //static_assert(sizeof(std::thread::id) != sizeof(boost::thread::id), "");
-            //return (std::thread::id&)this->thread.get_id();
-            return std::thread::id();
-         }
+         virtual uint64_t getID() final;
+         virtual uintptr_t getNativeHandle() final;
       };
 
       class BasicThreadPool : public shared::SharedObject<sat::ThreadPool> {
@@ -39,13 +38,15 @@ namespace sat {
       class DefaultThread : public shared::SharedObject<sat::Thread> {
       public:
          DefaultThreadPool* pool;
-         boost::thread::id threadId;
+         void* threadHandle;
+         uint64_t threadId;
          DefaultThread();
-         virtual std::thread::id getID() final {
-            //static_assert(sizeof(std::thread::id) != sizeof(boost::thread::id), "");
-            //return (std::thread::id&)this->thread.get_id();
-            return std::thread::id();
+         ~DefaultThread();
+         void* operator new(size_t size) {
+            return sat::memory::table->allocBuffer(sizeof(DefaultThread));
          }
+         virtual uint64_t getID() final;
+         virtual uintptr_t getNativeHandle() final;
       };
 
       class DefaultThreadPool : public shared::SharedObject<sat::ThreadPool> {

@@ -1,4 +1,5 @@
 #include "./threads.hpp"
+#include <Windows.h>
 
 using namespace sat;
 using namespace sat::impl;
@@ -31,7 +32,22 @@ Thread* Thread::current() {
 }
 
 DefaultThread::DefaultThread()
-   : pool(&root.defaultPools), threadId(boost::this_thread::get_id()) {
+   : pool(&root.defaultPools)
+{
+   this->threadId = GetCurrentThreadId();
+   this->threadHandle = 0;
+}
+DefaultThread::~DefaultThread() {
+   if (this->threadHandle) CloseHandle(this->threadHandle);
+}
+
+uint64_t DefaultThread::getID() {
+   return this->threadId;
+}
+
+uintptr_t DefaultThread::getNativeHandle() {
+   if (!this->threadHandle) this->threadHandle = OpenThread(PROCESS_ALL_ACCESS, TRUE, this->threadId);
+   return uintptr_t(this->threadHandle);
 }
 
 void DefaultThreadPool::foreach(std::function<void(Thread*)>&& callback) {
@@ -45,14 +61,23 @@ Thread* DefaultThreadPool::create(std::function<void()>&& entrypoint) {
    if (!::current_thread) {
       SpinLockHolder guard(this->lock);
       DefaultThread* thread = new DefaultThread();
+      ::current_thread = thread;
       this->threads.push_back(thread);
-      return  ::current_thread = thread;
+      return thread;
    }
    throw std::exception("cannot create current thread when already exists");
 }
 
 BasicThread::BasicThread(BasicThreadPool* pool, std::function<void()>&& entrypoint)
    : pool(pool), thread(pool->attrs, entrypoint) {
+}
+
+uint64_t BasicThread::getID() {
+   return uint64_t(GetThreadId(this->thread.native_handle()));
+}
+
+uintptr_t BasicThread::getNativeHandle() {
+   return uintptr_t(this->thread.native_handle());
 }
 
 BasicThreadPool::BasicThreadPool(int stacksize) {

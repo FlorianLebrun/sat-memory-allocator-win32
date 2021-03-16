@@ -18,9 +18,10 @@ namespace sat {
       };
       int heapId;
 
-      virtual std::thread::id getID() = 0;
+      virtual uint64_t getID() = 0;
+      virtual uintptr_t getNativeHandle() = 0;
 
-      static Thread* current();
+      static SAT_API Thread* current();
       
       template <typename T>
       T* getObject() { return (T*)this->objects[T::ThreadObjectID]; }
@@ -37,5 +38,5 @@ namespace sat {
       virtual void foreach(std::function<void(Thread*)>&& callback) = 0;
    };
 
-   extern ThreadPool* createThreadPool(std::function<void()>&& entrypoint = nullptr, int stacksize = 0);
+   SAT_API ThreadPool* createThreadPool(std::function<void()>&& entrypoint = nullptr, int stacksize = 0);
 }

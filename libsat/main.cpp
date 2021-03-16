@@ -1,4 +1,5 @@
-#include <sat-memory-allocator/sat-memory-allocator.h>
+#include <sat-memory-allocator/allocator.h>
+#include <sat-memory-allocator/stack_analysis.h>
 #include <windows.h>
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -6,7 +7,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
    switch (fdwReason)
    {
    case DLL_PROCESS_ATTACH:
-      sat_init_process(true);
+      sat_init_process();
       break;
    case DLL_PROCESS_DETACH:
       sat_terminate_process();

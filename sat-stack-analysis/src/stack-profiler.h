@@ -23,6 +23,7 @@ namespace sat {
       uint64_t lastSampleTime;
 
       ThreadStackProfiler(Thread* thread);
+      virtual ~ThreadStackProfiler() override;
 
       virtual void execute() override;
 

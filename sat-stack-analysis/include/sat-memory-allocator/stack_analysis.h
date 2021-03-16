@@ -5,12 +5,6 @@
 
 namespace sat {
 
-   struct LargeAllocator {
-      void* allocateSegment(size_t& size) { return false; }
-      void releaseSegment(void*) {}
-      static LargeAllocator allocator;
-   };
-
    //-----------------------------------------------------------------------------
    //-----------------------------------------------------------------------------
    //
@@ -149,9 +143,14 @@ namespace sat {
 
    }
    this->setObject<sat::ThreadStackTracker>(new ThreadStackTracker(this));*/
+   namespace analysis {
+      SAT_API IStackProfiler* createStackProfiler(Thread* thread);
+      SAT_API void traverseStack(uint64_t stackstamp, IStackVisitor* visitor);
+      SAT_API uint64_t getCurrentStackStamp();
+   }
 }
 
 // Stack marking API
-extern"C" void sat_begin_stack_beacon(sat::StackBeacon * beacon);
-extern"C" void sat_end_stack_beacon(sat::StackBeacon * beacon);
-extern"C" void sat_print_stackstamp(uint64_t stackstamp);
+extern"C" SAT_API void sat_begin_stack_beacon(sat::StackBeacon * beacon);
+extern"C" SAT_API void sat_end_stack_beacon(sat::StackBeacon * beacon);
+extern"C" SAT_API void sat_print_stackstamp(uint64_t stackstamp);

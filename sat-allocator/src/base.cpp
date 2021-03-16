@@ -9,6 +9,7 @@ static sat::tp_realloc _sat_default_realloc = 0;
 static sat::tp_msize _sat_default_msize = 0;
 static sat::tp_free _sat_default_free = 0;
 static bool is_initialized = false;
+static bool is_patched = false;
 
 struct CurrentLocalHeap {
 private:
@@ -64,15 +65,25 @@ void _sat_set_default_allocator(
    _sat_default_free = free;
 }
 
-void sat_init_process(bool patchlibs) {
-   extern void PatchWindowsFunctions();
+void sat_init_process() {
    if (!is_initialized) {
       is_initialized = true;
-      if (patchlibs) PatchWindowsFunctions();
       sat::memory::MemoryTable::initialize();
       g_SAT.initialize();
    }
-   //else printf("sat allocator is initalized more than once.");
+   else printf("sat library is initalized more than once.");
+}
+
+void sat_patch_default_allocator() {
+   extern void PatchWindowsFunctions();
+   if (!is_initialized) {
+      throw "Cannot patch before sat_init_process()";
+   }
+   else if (!is_patched) {
+      is_patched = true;
+      PatchWindowsFunctions();
+   }
+   else printf("default allocator is patched more than once.");
 }
 
 void sat_terminate_process() {
@@ -178,9 +189,8 @@ void* sat_realloc(void* ptr, size_t size, sat::tp_realloc default_realloc) {
 void sat_free(void* ptr, sat::tp_free default_free) {
    uintptr_t index = uintptr_t(ptr) >> sat::memory::cSegmentSizeL2;
    int size;
-   auto table = sat::memory::table;
-   if (index < table->descriptor.length) {
-      sat::tpHeapSegmentEntry entry = sat::tpHeapSegmentEntry(&table->entries[index]);
+   if (index < sat::memory::table->descriptor.length) {
+      auto entry = sat::memory::table->get<sat::memory::tHeapSegmentEntry>(index);
       if (entry->isHeapSegment()) {
          auto local_heap = CurrentLocalHeap::check();
          if (local_heap && entry->heapID == local_heap->heapID) {
@@ -207,7 +217,7 @@ void sat_free(void* ptr, sat::tp_free default_free) {
 bool sat_has_address(void* ptr) {
    uintptr_t index = uintptr_t(ptr) >> sat::memory::cSegmentSizeL2;
    if (index < sat::memory::table->descriptor.length) {
-      sat::memory::tpEntry entry = &sat::memory::table->entries[index];
+      auto entry = &sat::memory::table->entries[index];
       return (entry->id != sat::memory::tEntryID::FORBIDDEN && entry->id != sat::memory::tEntryID::FREE);
    }
    return false;
@@ -216,7 +226,7 @@ bool sat_has_address(void* ptr) {
 bool sat_get_address_infos(void* ptr, sat::tpObjectInfos infos) {
    uintptr_t index = uintptr_t(ptr) >> sat::memory::cSegmentSizeL2;
    if (index < sat::memory::table->descriptor.length) {
-      sat::memory::tpEntry entry = &sat::memory::table->entries[index];
+      auto entry = &sat::memory::table->entries[index];
       switch (entry->id) {
       case sat::tHeapEntryID::PAGE_ZONED_BUDDY:
          return ZonedBuddyAllocator::get_address_infos(uintptr_t(ptr), infos);

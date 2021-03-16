@@ -1,8 +1,25 @@
 #pragma once
 #include <sat-memory-allocator/stack_analysis.h>
 #include <sat-threads/spinlock.hpp>
+#include <sat-memory/memory.hpp>
+#include "./utils/alignment.h"
 
 namespace sat {
+
+   struct tTechEntryID {
+      enum _ {
+         PROFILING_SEGMENT = memory::tEntryID::__FIRST_TECHNICAL_SEGMENT + 1,
+      };
+   };
+
+   typedef struct tProfilingSegmentEntry {
+      uint8_t id; // = PROFILING_SEGMENT
+      uint64_t profilingID; // Number representing the profiling
+      void set(uint64_t profilingID = 0) {
+         this->id = tTechEntryID::PROFILING_SEGMENT;
+         this->profilingID = profilingID;
+      }
+   };
 
    template <class tData>
    class StackTree {
@@ -26,8 +43,8 @@ namespace sat {
          if (firstSegmentBuffer) {
             firstSegmentBuffer = alignX(8, firstSegmentBuffer);
             this->buffer_base = (char*)firstSegmentBuffer;
-            this->buffer_size = sat::cSegmentSize - (firstSegmentBuffer & sat::cSegmentOffsetMask);
-            sat::tpProfilingSegmentEntry(&g_SATable[firstSegmentBuffer >> sat::cSegmentSizeL2])->set(uintptr_t(this));
+            this->buffer_size = sat::memory::cSegmentSize - (firstSegmentBuffer & sat::memory::cSegmentOffsetMask);
+            memory::table->get<tProfilingSegmentEntry>(firstSegmentBuffer >> sat::memory::cSegmentSizeL2)->set(uintptr_t(this));
          }
          else {
             this->buffer_base = 0;
@@ -93,11 +110,11 @@ namespace sat {
          char* ptr;
          this->buffer_lock.lock();
          if (this->buffer_size < size) {
-            uintptr_t index = g_SAT.allocSegmentSpan(1);
-            sat::tpProfilingSegmentEntry(&g_SATable[index])->set(uintptr_t(this));
-            ptr = (char*)(index << sat::cSegmentSizeL2);
+            uintptr_t index = memory::table->allocSegmentSpan(1);
+            sat::memory::table->get<tProfilingSegmentEntry>(index)->set(uintptr_t(this));
+            ptr = (char*)(index << sat::memory::cSegmentSizeL2);
             this->buffer_base = ptr + size;
-            this->buffer_size = sat::cSegmentSize - size;
+            this->buffer_size = sat::memory::cSegmentSize - size;
          }
          else {
             ptr = this->buffer_base;
@@ -118,4 +135,5 @@ namespace sat {
       StackStampDatabase(uintptr_t firstSegmentBuffer = 0);
    };
 
+   StackStampDatabase* getStackStampDatabase();
 }

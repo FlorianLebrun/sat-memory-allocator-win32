@@ -1,7 +1,7 @@
 #pragma once
 #include <sat-threads/spinlock.hpp>
 #include "../../heaps/heaps.h"
-#include "../../utils/binary-arithmetic.h"
+#include "../../utils/alignment.h"
 
 #define OBJECT_LIST_CHECK(x)// x
 #define SAT_TRACE_ALLOC(x)// x
@@ -9,6 +9,9 @@
 #define SAT_TRACE(x)// x
 
 namespace ZonedBuddyAllocator {
+
+   typedef unsigned char tByte;
+   typedef unsigned char* tpBytes;
 
    // TAG: tagging in sat entry
    // when allocated: (allocated:1 = 1, [:4] = 0, sizeID:3)

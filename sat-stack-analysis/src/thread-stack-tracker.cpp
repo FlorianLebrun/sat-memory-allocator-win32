@@ -97,7 +97,7 @@ namespace sat {
       {
       }
       bool capture(Thread* thread) {
-         HANDLE hThread = thread->handle.handle;
+         HANDLE hThread = HANDLE(thread->getNativeHandle());
 
          // Get thread cpu context
          memset(&this->context, 0, sizeof(this->context));
@@ -304,9 +304,10 @@ namespace sat {
 
    uint64_t ThreadStackTracker::getStackStamp() {
       bool isCurrentThread = (Thread::current() == this->thread);
-      if (g_SAT.stackStampDatabase && isCurrentThread) {
+      auto stackdb = getStackStampDatabase();
+      if (stackdb && isCurrentThread) {
          typedef StackStampDatabase::tData tData;
-         StackTree<tData>& stacktree = g_SAT.stackStampDatabase->stacktree;
+         StackTree<tData>& stacktree = stackdb->stacktree;
          StackNode<tData>* node = &stacktree.root;
 
          // Update stack tracker with current stack

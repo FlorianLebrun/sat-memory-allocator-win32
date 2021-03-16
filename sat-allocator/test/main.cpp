@@ -1,4 +1,4 @@
-#include <sat-memory-allocator/sat-memory-allocator.h>
+#include <sat-memory-allocator/allocator.h>
 #include "./utils.h"
 
 extern void test_meta_alloc();
@@ -9,7 +9,7 @@ extern void test_btree();
 extern void test_stack_analysis();
 
 int main() {
-   sat_init_process(true);
+   //sat_patch_default_allocator();
 
    test_buffer_alloc();
    test_meta_alloc();

@@ -82,21 +82,4 @@ namespace sat {
       }
    } *tpObjectInfos;
 
-   struct IObjectVisitor {
-      virtual bool visit(tpObjectInfos obj) = 0;
-   };
-
-   struct IObjectAllocator {
-
-      virtual size_t getMaxAllocatedSize() = 0;
-      virtual size_t getMinAllocatedSize() = 0;
-      virtual size_t getAllocatedSize(size_t size) = 0;
-      virtual void* allocate(size_t size) = 0;
-
-      virtual size_t getMaxAllocatedSizeWithMeta() = 0;
-      virtual size_t getMinAllocatedSizeWithMeta() = 0;
-      virtual size_t getAllocatedSizeWithMeta(size_t size) = 0;
-      virtual void* allocateWithMeta(size_t size, uint64_t meta) = 0;
-   };
-
 }

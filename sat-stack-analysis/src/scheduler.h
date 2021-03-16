@@ -11,6 +11,6 @@ namespace sat {
       virtual void execute() = 0;
    };
 
-   static void addTickWorker(TickWorker* worker);
-   static void removeTickWorker(TickWorker* worker);
+   void addTickWorker(TickWorker* worker);
+   void removeTickWorker(TickWorker* worker);
 }

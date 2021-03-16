@@ -1,13 +1,21 @@
 set(target libsat)
 
-# Collect source files
-append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES ".")
-
-# Add linker def file
-list(APPEND files ${CMAKE_CURRENT_SOURCE_DIR}/library.def)
-
 # Create library
 add_library(${target} SHARED main.cpp)
 set_target_properties(${target} PROPERTIES FOLDER "Dll")
 
-target_link_libraries(${target} PRIVATE sat-threads sat-memory sat-allocator)
+# Set compile properties
+target_compile_definitions(${target} PRIVATE "SAT_API=__declspec(dllexport)")
+target_compile_definitions(${target} INTERFACE "SAT_API=__declspec(dllimport)")
+
+# Set link properties
+target_link_libraries(${target} PRIVATE sat-threads sat-memory sat-allocator sat-stack-analysis)
+target_link_options(${target} PRIVATE /WHOLEARCHIVE:sat-threads /WHOLEARCHIVE:sat-memory /WHOLEARCHIVE:sat-allocator /WHOLEARCHIVE:sat-stack-analysis)
+
+# Export interface of libraries linked inside this shared library
+target_include_directories(${target} INTERFACE $<TARGET_PROPERTY:libsat,INCLUDE_DIRECTORIES>)
+
+# Setting for development comfort
+if(DEVMODE AND SATMEM_POST_BUILD_DIRS)
+set_target_postbuild_copy(${target} TO ${SATMEM_POST_BUILD_DIRS})
+endif()

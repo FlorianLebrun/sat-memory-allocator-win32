@@ -33,43 +33,44 @@ namespace sat {
 
       const uintptr_t cMemorySAT_MaxSpanClass = 128;
 
-      typedef struct tDescriptorEntry {
+      struct tDescriptorEntry {
          uint8_t id; // = SAT_DESCRIPTOR
          uint8_t bytesPerAddress; // Bytes per address (give the sizeof intptr_t)
          uint8_t bytesPerSegmentL2; // Bytes per segment (in log2)
          uintptr_t length; // Length of table
          uintptr_t limit; // Limit of table length
-      } *tpDescriptorEntry;
+      };
 
-      typedef struct tSegmentEntry {
+      struct tSegmentEntry {
          uint8_t id; // = SAT_SEGMENT
          void set() {
             this->id = tEntryID::SAT_SEGMENT;
          }
-      } *tpSegmentEntry;
+      };
 
-      typedef struct tFreeEntry {
+      struct tFreeEntry {
          uint8_t id; // = FREE
          uint8_t isReserved;
          void set(uint8_t isReserved) {
             this->id = tEntryID::FREE;
             this->isReserved = isReserved;
          }
-      } *tpFreeEntry;
+      };
 
-      typedef struct tForbiddenEntry {
+      struct tForbiddenEntry {
          uint8_t id; // = FORBIDDEN
          void set() {
             this->id = tEntryID::FORBIDDEN;
          }
-      } *tpForbiddenEntry;
+      };
 
-      typedef struct tHeapSegmentEntry {
+      struct tHeapSegmentEntry {
          uint8_t id;
          uint8_t heapID;
-      } *tpHeapSegmentEntry;
+         bool isHeapSegment() { return this->id < sat::memory::tEntryID::SAT_SEGMENT; }
+      };
 
-      typedef struct tEntry {
+      struct tEntry {
          union {
             tDescriptorEntry SATDescriptor;
             tSegmentEntry SATSegment;
@@ -86,7 +87,7 @@ namespace sat {
          T* get(uintptr_t index) { return (T*)&this[index]; }
          int getHeapID() { return (this->id & 0x40) ? -1 : this->heapSegment.heapID; }
          bool isHeapSegment(int id) { return this->id < tEntryID::SAT_SEGMENT; }
-      } *tpEntry;
+      };
 
       static_assert(sizeof(tEntry) == cEntrySize, "Bad tEntry size");
    }

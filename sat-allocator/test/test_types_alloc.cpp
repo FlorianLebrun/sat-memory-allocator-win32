@@ -1,4 +1,4 @@
-#include <sat-memory-allocator/sat-memory-allocator.h>
+#include <sat-memory-allocator/allocator.h>
 #include "./utils.h"
 
 struct myClass2 {

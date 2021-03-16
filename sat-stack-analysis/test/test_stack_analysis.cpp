@@ -1,8 +1,6 @@
-#include <sat-memory-allocator/sat-memory-allocator.h>
+#include <sat-memory-allocator/allocator.h>
 #include <sat-memory-allocator/stack_analysis.h>
-#include <chrono>
-
-using namespace std::chrono;
+#include <sat-threads/timing.hpp>
 
 struct TestStackMarker : sat::IStackMarker {
    int level;
@@ -48,7 +46,7 @@ void test_stack_print() {
             //call(level - 2);
          }
          else {
-            auto stackstamp = sat_current_thread()->getStackStamp();
+            auto stackstamp = sat::analysis::getCurrentStackStamp();
             sat_print_stackstamp(stackstamp);
          }
       }
@@ -67,16 +65,15 @@ void test_deep_basic_call(int count) {
             calltest(level - 1);
          }
          else {
-            sat_current_thread()->getStackStamp();
+            sat::analysis::getCurrentStackStamp();
          }
       }
    };
-   auto start = high_resolution_clock::now();
+   sat::timing::Chrono c;
    for (int i = 0; i < count; i++) {
       _internal::calltest(25 + (i & 3));
    }
-   auto end = high_resolution_clock::now();
-   printf("[sat-stack-analysis] stack trace time = %lg us\n", duration<double, microseconds>(end - start).count());
+   printf("[sat-stack-analysis] stack trace time = %lg us\n", c.GetDiffDouble(sat::timing::Chrono::US));
 }
 
 void test_stack_analysis() {
