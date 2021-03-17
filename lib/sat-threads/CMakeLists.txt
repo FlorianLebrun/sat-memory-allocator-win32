@@ -2,10 +2,10 @@ set(target sat-threads)
 
 # Collect source files
 append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES 
-  "./include/${target}"
   "./src"
   "./src/worker"
 )
+append_group_sources(files FILTER "*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES "./sat")
 
 # Create library
 add_library(${target} STATIC ${files})

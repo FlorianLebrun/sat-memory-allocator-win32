@@ -19,9 +19,7 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIE
   "./win32"
   "./win32/patcher"
 )
-append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES 
-  "./sat-memory-allocator"
-)
+append_group_sources(files FILTER "*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES "./sat")
 
 # Source includes
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

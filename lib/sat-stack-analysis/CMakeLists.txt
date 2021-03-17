@@ -2,11 +2,11 @@ set(target sat-stack-analysis)
 
 # Collect source files
 append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES 
-  "./include/sat-memory-allocator"
   "./src"
   "./src/utils"
   "./src/win32"
 )
+append_group_sources(files FILTER "*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES "./sat")
 
 list(APPEND files ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/llcode.x64.asm)
 
