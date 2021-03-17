@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
-#include <sat-threads/shared.hpp>
-#include <sat-threads/thread.hpp>
+#include <sat/shared.hpp>
+#include <sat/thread.hpp>
 
 namespace sat {
 

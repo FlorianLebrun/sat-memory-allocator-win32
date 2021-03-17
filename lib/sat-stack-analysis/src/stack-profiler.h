@@ -1,5 +1,5 @@
 #pragma once
-#include <sat-threads/shared.hpp>
+#include <sat/shared.hpp>
 #include "./scheduler.h"
 #include "./stack-stamp.h"
 #include "./thread-stack-tracker.h"

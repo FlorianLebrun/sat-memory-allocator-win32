@@ -1,9 +1,9 @@
 #pragma once
-#include <sat-threads/thread.hpp>
-#include <sat-threads/spinlock.hpp>
+#include <sat/thread.hpp>
+#include <sat/spinlock.hpp>
 #include <boost/thread.hpp>
 
-#include <sat-memory/memory.hpp>
+#include <sat/memory.hpp>
 
 namespace sat {
    namespace impl {

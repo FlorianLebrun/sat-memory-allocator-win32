@@ -8,17 +8,21 @@ set(toolset "msvc-${msvc_major}.${msvc_minor}")
 # Detect address mode to use for Boost
 getTargetCPUAddressMode(address_model)
 
+# Boost unpacking
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/bootstrap.bat")
+message(STATUS "Boost unpacking... [Architecture: ${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}]" )
+exec_program(${CMAKE_COMMAND} "${CMAKE_CURRENT_BINARY_DIR}" ARGS -E tar x "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_70_0.7z")
+endif()
+
 # Compile b2 tool
 set(BOOST_b2 "${CMAKE_CURRENT_BINARY_DIR}/b2.exe")
 add_custom_command(OUTPUT ${BOOST_b2}
-  COMMENT "Boost unpacking..."
+  COMMENT "Boost B2 building..."
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMAND ${CMAKE_COMMAND} -E tar x "${CMAKE_CURRENT_SOURCE_DIR}/boost_1_70_0.7z"
   COMMAND call bootstrap.bat
 )
 
 # Build Boost libraries
-message( STATUS "Architecture: ${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" )
 set(BOOST_log_file "${CMAKE_CURRENT_BINARY_DIR}/build-log.txt")
 add_custom_command(OUTPUT ${BOOST_log_file} DEPENDS ${BOOST_b2}
   COMMENT "Boost building..."

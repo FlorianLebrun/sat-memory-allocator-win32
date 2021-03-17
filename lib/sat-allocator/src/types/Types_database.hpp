@@ -1,5 +1,5 @@
 
-#include <sat-threads/thread.hpp>
+#include <sat/thread.hpp>
 
 namespace sat {
   void TypesDataBase_init();

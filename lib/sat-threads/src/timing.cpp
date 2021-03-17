@@ -1,4 +1,4 @@
-#include "./sat-threads/timing.hpp"
+#include <sat/timing.hpp>
 #include <chrono>
 
 static uint64_t timeOrigin = _Query_perf_counter();

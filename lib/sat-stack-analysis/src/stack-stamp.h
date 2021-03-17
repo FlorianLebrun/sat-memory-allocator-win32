@@ -1,7 +1,7 @@
 #pragma once
-#include <sat-memory-allocator/stack_analysis.h>
-#include <sat-threads/spinlock.hpp>
-#include <sat-memory/memory.hpp>
+#include <sat/stack_analysis.h>
+#include <sat/spinlock.hpp>
+#include <sat/memory.hpp>
 #include "./utils/alignment.h"
 
 namespace sat {

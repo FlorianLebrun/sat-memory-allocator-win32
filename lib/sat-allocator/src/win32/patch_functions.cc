@@ -95,8 +95,8 @@
 #include <map>
 #include <vector>
 #include <atomic>
-#include <sat-threads/spinlock.hpp>
-#include <sat-memory-allocator/allocator.h>
+#include <sat/spinlock.hpp>
+#include <sat/allocator.h>
 #include "patcher/preamble_patcher.h"
 
 std::atomic<intptr_t> _windows_loader_working;

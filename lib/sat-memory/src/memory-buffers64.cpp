@@ -1,5 +1,5 @@
-#include <sat-memory/memory.hpp>
-#include <sat-threads/spinlock.hpp>
+#include <sat/memory.hpp>
+#include <sat/spinlock.hpp>
 #include "./memory-buffers64.hpp"
 #include "./utils/bitwise.h"
 #include <exception>

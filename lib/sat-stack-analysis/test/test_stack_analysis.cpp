@@ -1,6 +1,6 @@
-#include <sat-memory-allocator/allocator.h>
-#include <sat-memory-allocator/stack_analysis.h>
-#include <sat-threads/timing.hpp>
+#include <sat/allocator.h>
+#include <sat/stack_analysis.h>
+#include <sat/timing.hpp>
 
 struct TestStackMarker : sat::IStackMarker {
    int level;

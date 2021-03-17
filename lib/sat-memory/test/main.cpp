@@ -1,4 +1,4 @@
-#include <sat-memory/memory.hpp>
+#include <sat/memory.hpp>
 
 int main() {
    sat::memory::MemoryTable::initialize();

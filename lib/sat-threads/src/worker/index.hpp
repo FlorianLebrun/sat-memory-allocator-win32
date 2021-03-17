@@ -1,6 +1,6 @@
 #pragma once
-#include <sat-threads/worker.hpp>
-#include <sat-threads/spinlock.hpp>
+#include <sat/worker.hpp>
+#include <sat/spinlock.hpp>
 #include "../threads.hpp"
 
 #include <boost/asio/io_context.hpp>

@@ -1,4 +1,4 @@
-#include <sat-threads/spinlock.hpp>
+#include <sat/spinlock.hpp>
 
 // NOTE on the Lock-state values:
 //

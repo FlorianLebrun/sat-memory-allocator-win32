@@ -1,6 +1,6 @@
 #pragma once
-#include <sat-memory-allocator/allocator.h>
-#include <sat-threads/spinlock.hpp>
+#include <sat/allocator.h>
+#include <sat/spinlock.hpp>
 #include "./AllocatorSizeMapping.h"
 #include "../table.h"
 

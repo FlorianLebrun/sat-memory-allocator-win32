@@ -1,6 +1,6 @@
 #include "./heaps.h"
 #include "../controller.h"
-#include <sat-threads/timing.hpp>
+#include <sat/timing.hpp>
 
 using namespace sat;
 

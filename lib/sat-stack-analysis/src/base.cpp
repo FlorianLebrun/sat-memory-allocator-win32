@@ -1,5 +1,5 @@
-#include <sat-memory-allocator/stack_analysis.h>
-#include <sat-memory-allocator/allocator.h>
+#include <sat/stack_analysis.h>
+#include <sat/allocator.h>
 #include "./stack-stamp.h"
 #include "./thread-stack-tracker.h"
 

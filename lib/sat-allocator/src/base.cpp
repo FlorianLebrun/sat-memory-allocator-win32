@@ -1,7 +1,7 @@
 #include "./allocators/ZonedBuddy/index.h"
 #include "./allocators/LargeObject/index.h"
 #include "./controller.h"
-#include <sat-threads/thread.hpp>
+#include <sat/thread.hpp>
 #include <iostream>
 
 static sat::tp_malloc _sat_default_malloc = 0;

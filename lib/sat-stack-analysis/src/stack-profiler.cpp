@@ -1,5 +1,5 @@
 #include "./stack-profiler.h"
-#include <sat-threads/timing.hpp>
+#include <sat/timing.hpp>
 
 namespace sat {
 

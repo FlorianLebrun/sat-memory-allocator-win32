@@ -1,6 +1,6 @@
 #pragma once
-#include <sat-memory/memory.hpp>
-#include <sat-threads/thread.hpp>
+#include <sat/memory.hpp>
+#include <sat/thread.hpp>
 #include "./objects_types.h"
 #include "./objects_infos.h"
 

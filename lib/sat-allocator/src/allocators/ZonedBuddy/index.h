@@ -1,5 +1,5 @@
 #pragma once
-#include <sat-threads/spinlock.hpp>
+#include <sat/spinlock.hpp>
 #include "../../heaps/heaps.h"
 #include "../../utils/alignment.h"
 

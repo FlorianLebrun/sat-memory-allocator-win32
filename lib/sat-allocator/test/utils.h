@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <sat-threads/timing.hpp>
+#include <sat/timing.hpp>
 
 class Chrono {
    int64_t freq, t0;

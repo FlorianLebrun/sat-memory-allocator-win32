@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sat-memory-allocator/stack_analysis.h>
+#include <sat/stack_analysis.h>
 #include <string>
 #include <functional>
 

@@ -1,6 +1,6 @@
 #pragma once
-#include <sat-memory/memory.hpp>
-#include <sat-threads/spinlock.hpp>
+#include <sat/memory.hpp>
+#include <sat/spinlock.hpp>
 #include "./utils/btree.h"
 
 namespace sat {
