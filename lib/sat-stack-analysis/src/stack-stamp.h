@@ -2,7 +2,7 @@
 #include <sat/stack_analysis.h>
 #include <sat/spinlock.hpp>
 #include <sat/memory.hpp>
-#include "./utils/alignment.h"
+#include "../../common/alignment.h"
 
 namespace sat {
 
@@ -12,7 +12,7 @@ namespace sat {
       };
    };
 
-   typedef struct tProfilingSegmentEntry {
+   struct tProfilingSegmentEntry {
       uint8_t id; // = PROFILING_SEGMENT
       uint64_t profilingID; // Number representing the profiling
       void set(uint64_t profilingID = 0) {

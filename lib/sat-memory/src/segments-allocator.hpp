@@ -1,7 +1,7 @@
 #pragma once
 #include <sat/memory.hpp>
 #include <sat/spinlock.hpp>
-#include "./utils/btree.h"
+#include "./btree.h"
 
 namespace sat {
 

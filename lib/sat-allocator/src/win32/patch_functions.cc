@@ -81,8 +81,8 @@
 #endif
 
 #define CHECK(x) x
-#define CHECK_NE(x, y) (x)!=(y)
-#define CHECK_EQ(x, y) (x)==(y)
+#define CHECK_NE(x, y) if((x)!=(y));
+#define CHECK_EQ(x, y) if((x)==(y));
 #define __THROW
 
 #define FAKE_PATCH 0 // Redirect hook on previous function debug hooking without new function issues

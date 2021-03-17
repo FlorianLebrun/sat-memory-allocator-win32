@@ -243,7 +243,7 @@ static inline int msb_32(unsigned x)
 	return result;
 }
 
-#ifdef __x86_64__
+#ifdef _WIN64
 static inline size_t lsb_64(unsigned long long x)
 {
 	unsigned long result;
@@ -256,7 +256,7 @@ static inline size_t lsb_64(unsigned long long x)
 // TODO
 #endif
 
-#ifdef __x86_64__
+#ifdef _WIN64
 static inline size_t msb_64(unsigned long long x)
 {
 	unsigned long result;
@@ -269,10 +269,10 @@ static inline size_t msb_64(unsigned long long x)
 // TODO
 #endif
 
-#ifdef __x86_64__
+#ifdef _WIN64
 static inline void *xchg_ptr(void *ptr, void *x)
 {
-	return (void *) _InterlockedExchange64(ptr, (__int64) x);
+	return (void *) _InterlockedExchange64((volatile __int64*)ptr, (__int64) x);
 }
 #else
 static inline void *xchg_ptr(void *ptr, void *x)

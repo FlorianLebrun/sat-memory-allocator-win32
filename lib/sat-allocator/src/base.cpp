@@ -77,7 +77,8 @@ void sat_init_process() {
 void sat_patch_default_allocator() {
    extern void PatchWindowsFunctions();
    if (!is_initialized) {
-      throw "Cannot patch before sat_init_process()";
+      printf("Critical: Cannot patch before sat_init_process()");
+      exit(1);
    }
    else if (!is_patched) {
       is_patched = true;
@@ -150,10 +151,9 @@ size_t sat_msize(void* ptr, sat::tp_msize default_msize) {
    else {
       if (default_msize) return default_msize(ptr);
       else if (_sat_default_msize) return _sat_default_msize(ptr);
-      else {
-         printf("sat cannot find size of unkown buffer\n");
-      }
+      else printf("sat cannot find size of unkown buffer\n");
    }
+   return 0;
 }
 
 void* sat_realloc(void* ptr, size_t size, sat::tp_realloc default_realloc) {
@@ -205,13 +205,11 @@ void sat_free(void* ptr, sat::tp_free default_free) {
       else if (entry->id == sat::memory::tEntryID::FORBIDDEN || entry->id == sat::memory::tEntryID::FREE) {
          if (default_free) default_free(ptr);
          else if (_sat_default_free) _sat_default_free(ptr);
-         else {
-            printf("sat cannot free unkown buffer\n");
-         }
+         else printf("sat cannot free unkown buffer\n");
       }
-      else printf("sat_free: out of range pointer %.8ulX\n", uint64_t(ptr));
+      else printf("sat_free: out of range pointer %.12llX\n", int64_t(ptr));
    }
-   else printf("sat_free: out of range pointer %.8ulX\n", uint64_t(ptr));
+   else printf("sat_free: out of range pointer %.12llX\n", int64_t(ptr));
 }
 
 bool sat_has_address(void* ptr) {
@@ -239,9 +237,7 @@ bool sat_get_address_infos(void* ptr, sat::tpObjectInfos infos) {
       case sat::tHeapEntryID::PAGE_SCALED_BUDDY_11:
       case sat::tHeapEntryID::PAGE_SCALED_BUDDY_13:
       case sat::tHeapEntryID::PAGE_SCALED_BUDDY_15:
-         if (infos) {
-            infos->set(entry->getHeapID(), uintptr_t(ptr), 0);
-         }
+         if (infos) infos->set(entry->getHeapID(), uintptr_t(ptr), 0);
          return true;
       }
    }

@@ -129,7 +129,7 @@ namespace sat {
    void NativeStackMarker::getSymbol(char* buffer, int size) {
       SystemThreading::tSymbol symbol(buffer, size);
       if (!symbol.resolve(this->base)) {
-         sprintf_s(buffer, size, "0x%.8lX", uint64_t(this->base));
+         sprintf_s(buffer, size, "0x%.12llX", int64_t(this->base));
       }
    }
 

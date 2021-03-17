@@ -1,9 +1,9 @@
 set(target sat-threads)
 
 # Collect source files
-append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES 
-  "./src"
-  "./src/worker"
+append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIES 
+  "./"
+  "./worker"
 )
 append_group_sources(files FILTER "*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES "./sat")
 

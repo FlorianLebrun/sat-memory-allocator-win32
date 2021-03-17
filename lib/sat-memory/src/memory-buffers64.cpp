@@ -1,7 +1,7 @@
 #include <sat/memory.hpp>
 #include <sat/spinlock.hpp>
 #include "./memory-buffers64.hpp"
-#include "./utils/bitwise.h"
+#include "../../common/bitwise.h"
 #include <exception>
 
 void sat::PooledBuffers64::initialize(sat::memory::MemoryTable* table) {

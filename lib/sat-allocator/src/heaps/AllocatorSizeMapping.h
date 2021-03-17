@@ -1,6 +1,6 @@
 #pragma once
-#include "../utils/alignment.h"
-#include "../utils/bitwise.h"
+#include "../../../common/alignment.h"
+#include "../../../common/bitwise.h"
 
 namespace sat {
 

@@ -1,8 +1,8 @@
 #include "./segments-allocator.hpp"
 #include "./memory-buffers64.hpp"
 #include "./win32/system.h"
-#include "./utils/alignment.h"
-#include "./utils/bitwise.h"
+#include "../../common/alignment.h"
+#include "../../common/bitwise.h"
 #include <algorithm>
 #include <string>
 

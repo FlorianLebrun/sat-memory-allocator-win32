@@ -52,7 +52,7 @@ void test_types_alloc() {
 
   struct Visitor : sat::IObjectVisitor {
     virtual bool visit(sat::tpObjectInfos obj) override {
-      printf("%.8X\n", obj->base);
+      printf("%.12llX\n", obj->base);
       return true;
     }
   };

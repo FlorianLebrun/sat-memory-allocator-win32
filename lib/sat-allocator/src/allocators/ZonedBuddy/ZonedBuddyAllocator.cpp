@@ -89,14 +89,15 @@ namespace ZonedBuddyAllocator {
          else {
             uintptr_t base = uintptr_t(obj) + tObject::headerSize;
             if (obj->tag & cTAG_METADATA_BIT) {
-               if (infos) infos->set(entry->heapID, base + sizeof(uint64_t), (1 << sizeL2) - sizeof(uint64_t), (uint64_t*)base);
+               if (infos) infos->set(entry->heapID, base + sizeof(uint64_t), (uintptr_t(1) << sizeL2) - sizeof(uint64_t), (uint64_t*)base);
             }
             else {
-               if (infos) infos->set(entry->heapID, base, 1 << sizeL2);
+               if (infos) infos->set(entry->heapID, base, uintptr_t(1) << sizeL2);
             }
             return true;
          }
       }
+      return false;
    }
 }
 

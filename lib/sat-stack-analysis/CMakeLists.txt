@@ -1,10 +1,10 @@
 set(target sat-stack-analysis)
 
 # Collect source files
-append_group_sources(files FILTER "*.c|*.cpp|*.h|*.hpp" DIRECTORIES 
-  "./src"
-  "./src/utils"
-  "./src/win32"
+append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIES 
+  "./"
+  # Win32 specific
+  "./win32"
 )
 append_group_sources(files FILTER "*.h|*.hpp" GROUP "Include" ROOT "./include" DIRECTORIES "./sat")
 

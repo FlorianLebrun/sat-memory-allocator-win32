@@ -13,7 +13,6 @@ append_group_sources(files FILTER "*.cc|*.cpp|*.h|*.hpp" ROOT "./src" DIRECTORIE
   "./heaps/Compact"
 
   "./types"
-  "./utils"
 
   # Win32 specific
   "./win32"

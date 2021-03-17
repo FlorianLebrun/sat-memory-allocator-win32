@@ -44,7 +44,7 @@ struct MyWork : worker::IWork {
          std::this_thread::sleep_for(milliseconds(this->time));
       }
       auto end = high_resolution_clock::now();
-      printf("payload %ld on %d -- %lg s\n", this->id, std::this_thread::get_id(), duration<double>(end - start).count());
+      printf("payload %lld on %lld -- %lg s\n", this->id, Thread::current()->getID(), duration<double>(end - start).count());
    }
    virtual void abortWork() override {
    }

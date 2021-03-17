@@ -69,7 +69,7 @@ struct tTest {
     }
     printf("[sat-malloc] free time = %g ns\n", c.GetDiffFloat(Chrono::NS) / float(count));
     for (int i = 0; i < remain; i++) {
-      printf(">> remain at %.8X\n", uintptr_t(objects[i]));
+      printf(">> remain at %.12llX\n", int64_t(objects[i]));
     }
 
     return;

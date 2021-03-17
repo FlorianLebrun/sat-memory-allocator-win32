@@ -2,7 +2,7 @@
 
 namespace sat {
 
-   static struct PooledBuffers64 {
+   struct PooledBuffers64 {
 
       typedef union tBuffer64 {
          tBuffer64* next;
