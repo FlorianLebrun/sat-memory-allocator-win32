@@ -20,14 +20,4 @@ set(SATMEM_POST_BUILD_DIRS ${PROJECT_DEV_DIR})
 
 # Add projects
 add_subdirectory("./thirdparty/boost")
-add_subdirectory("./sat-memory")
-add_subdirectory("./sat-allocator")
-add_subdirectory("./sat-stack-analysis")
-add_subdirectory("./sat-threads")
-add_subdirectory("./libsat")
-
-# Add tests projects
-add_subdirectory("./sat-memory/test")
-add_subdirectory("./sat-allocator/test")
-add_subdirectory("./sat-stack-analysis/test")
-add_subdirectory("./sat-threads/test")
+add_subdirectory("./lib")
