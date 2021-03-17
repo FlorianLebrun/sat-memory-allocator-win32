@@ -7,7 +7,9 @@ add_subdirectory("./sat-threads")
 add_subdirectory("./shared")
 
 # Add tests projects
+if(ENABLE_TESTS)
 add_subdirectory("./sat-memory/test")
 add_subdirectory("./sat-allocator/test")
 add_subdirectory("./sat-stack-analysis/test")
 add_subdirectory("./sat-threads/test")
+endif()
