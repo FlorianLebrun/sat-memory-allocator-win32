@@ -128,21 +128,7 @@ namespace sat {
       virtual void startProfiling() = 0;
       virtual void stopProfiling() = 0;
    };
-/*
-   struct Controller {
-      StackStampDatabase* stackStampDatabase = StackStampDatabase::create();
 
-      IStackProfiler* createStackProfiler(Thread* thread) {
-         return new(this->allocBuffer(sizeof(ThreadStackProfiler))) ThreadStackProfiler((Thread*)thread);
-      }
-      void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) {
-         if (this->stackStampDatabase) {
-            this->stackStampDatabase->traverseStack(stackstamp, visitor);
-         }
-      }
-
-   }
-   this->setObject<sat::ThreadStackTracker>(new ThreadStackTracker(this));*/
    namespace analysis {
       SAT_API IStackProfiler* createStackProfiler(Thread* thread);
       SAT_API void traverseStack(uint64_t stackstamp, IStackVisitor* visitor);

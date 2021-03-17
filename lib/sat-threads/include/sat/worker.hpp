@@ -46,7 +46,7 @@ namespace sat {
          virtual void foreachThread(std::function<void(Thread*)>&& callback) = 0;
       };
 
-      extern WorkPool* createWorkPool(int nominal_thread_count, int maximum_thread_count, int stack_size = 0);
+      extern SAT_API WorkPool* createWorkPool(int nominal_thread_count, int maximum_thread_count, int stack_size = 0);
    };
 }
 

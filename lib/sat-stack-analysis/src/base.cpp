@@ -1,6 +1,7 @@
 #include <sat/stack_analysis.h>
 #include <sat/allocator.h>
 #include "./stack-stamp.h"
+#include "./stack-profiler.h"
 #include "./thread-stack-tracker.h"
 
 __forceinline sat::ThreadStackTracker* getCurrentStackTracker() {
@@ -51,6 +52,15 @@ void sat_print_stackstamp(uint64_t stackstamp) {
 
 namespace sat {
    namespace analysis {
+      IStackProfiler* createStackProfiler(Thread* thread) {
+         return new ThreadStackProfiler(thread);
+      }
+      void traverseStack(uint64_t stackstamp, IStackVisitor* visitor) {
+         auto stackdb = getStackStampDatabase();
+         if (stackdb) {
+            stackdb->traverseStack(stackstamp, visitor);
+         }
+      }
       uint64_t getCurrentStackStamp() {
          auto tracker = getCurrentStackTracker();
          return tracker->getStackStamp();

@@ -8,7 +8,7 @@ add_executable(${target} WIN32 ${files})
 set_target_properties(${target} PROPERTIES FOLDER "Tests")
 
 # Set link properties
-target_link_libraries(${target} PRIVATE sat-memory)
+target_link_libraries(${target} PRIVATE libsat)
 target_link_options(${target} PRIVATE /SUBSYSTEM:CONSOLE)
 
 # Setting for development comfort

@@ -12,7 +12,7 @@ namespace sat {
       const uintptr_t cSegmentMinIndex = 32;
       const uintptr_t cSegmentMinAddress = cSegmentMinIndex << cSegmentSizeL2;
 
-      struct MemoryTable {
+      struct SAT_API MemoryTable {
          union {
             tDescriptorEntry descriptor;
             tEntry entries[1];
@@ -42,6 +42,6 @@ namespace sat {
          MemoryTable(uintptr_t size, uintptr_t limit);
       };
 
-      extern MemoryTable* table;
+      extern SAT_API MemoryTable* table;
    }
 }
