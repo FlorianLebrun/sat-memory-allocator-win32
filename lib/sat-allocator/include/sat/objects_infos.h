@@ -72,7 +72,7 @@ namespace sat {
 
             // Read and check padding bytes
             uint8_t* bytes = (uint8_t*)this->base;
-            for (int i = bufferSize; i < paddingEnd; i++) {
+            for (uint32_t i = bufferSize; i < paddingEnd; i++) {
                if (bytes[i] != 0xab) {
                   return &bytes[i];
                }

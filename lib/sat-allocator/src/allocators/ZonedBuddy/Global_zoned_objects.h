@@ -9,8 +9,8 @@ namespace ZonedBuddyAllocator {
          static const int subSizeID = sizeID | (dividor << 2);
          static const int subObjectSize = (((supportSize >> sizeID) - sizeof(tZone)) / dividor) & (-8);
          static const int subObjectPerZone = dividor;
-         static const int subObjectPerTryCache = (4 >> (supportLengthL2 - sizeID)) || 1;
-         static const int subObjectPerTryScavenge = (4 >> (supportLengthL2 - sizeID)) || 1;
+         static const int subObjectPerTryCache = computeObjectBatchSize(sizeID);
+         static const int subObjectPerTryScavenge = computeObjectBatchSize(sizeID);
          static const int allocatedSize = subObjectSize;
 
          sat::SpinLock lock;

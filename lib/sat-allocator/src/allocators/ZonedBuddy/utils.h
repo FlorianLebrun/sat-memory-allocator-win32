@@ -1,5 +1,5 @@
 #pragma once
-#include "../../utils/bitwise.h"
+#include "../../common/bitwise.h"
 
 namespace ZonedBuddyAllocator {
 

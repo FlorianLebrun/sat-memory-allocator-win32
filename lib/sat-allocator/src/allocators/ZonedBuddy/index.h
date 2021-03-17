@@ -1,7 +1,7 @@
 #pragma once
 #include <sat/spinlock.hpp>
 #include "../../heaps/heaps.h"
-#include "../../utils/alignment.h"
+#include "../../../../common/alignment.h"
 
 #define OBJECT_LIST_CHECK(x)// x
 #define SAT_TRACE_ALLOC(x)// x
@@ -57,6 +57,10 @@ namespace ZonedBuddyAllocator {
    const int supportLength = 1 << supportLengthL2;
    const int supportSizeL2 = sat::memory::cSegmentSizeL2 - 1;
    const int supportSize = 1 << supportSizeL2;
+
+   inline constexpr int computeObjectBatchSize(int sizeID) {
+      return (4 >> (supportLengthL2 - sizeID)) || 1;
+   }
 
    typedef struct tSATEntry {
       uint8_t id;

@@ -65,7 +65,7 @@ void SystemThreading::ResumeThread(SystemThreading::tThread* thread) {
 }
 
 SystemThreading::tThread SystemThreading::GetThreadFromID(uint64_t threadID) {
-   return SystemThreading::tThread(threadID, OpenThread(THREAD_ALL_ACCESS, FALSE, threadID));
+   return SystemThreading::tThread(threadID, OpenThread(THREAD_ALL_ACCESS, FALSE, DWORD(threadID)));
 }
 
 SystemThreading::tThread SystemThreading::GetCurrentThread() {

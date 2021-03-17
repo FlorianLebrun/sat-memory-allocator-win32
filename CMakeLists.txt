@@ -15,7 +15,6 @@ include(${NODE_TOOLS}/index.cmake)
 # Set Global compilation options
 add_compile_definitions(WINVER=0x0600)
 add_compile_definitions(_WIN32_WINNT=0x0600)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
 
 # Setting for development comfort
 set(SATMEM_POST_BUILD_DIRS ${PROJECT_DEV_DIR})

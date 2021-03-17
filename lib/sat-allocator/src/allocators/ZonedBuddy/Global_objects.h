@@ -15,8 +15,8 @@ namespace ZonedBuddyAllocator {
          static const uintptr_t objectSize = 1 << sizeL2;
          static const uintptr_t objectPtrMask = uint64_t(-1) << sizeL2;
          static const uintptr_t objectOffsetMask = ~objectPtrMask;
-         static const int objectPerTryCache = (4 >> (supportLengthL2 - sizeID)) || 1;
-         static const int objectPerTryScavenge = (4 >> (supportLengthL2 - sizeID)) || 1;
+         static const int objectPerTryCache = computeObjectBatchSize(sizeID);
+         static const int objectPerTryScavenge = computeObjectBatchSize(sizeID);
          static const size_t allocatedSize = objectSize;
 
          sat::SpinLock lock;

@@ -57,12 +57,14 @@ namespace sat {
     uint32_t length; // Size of this structure in memory
   };
 
+#pragma warning(disable : 4200)
   template <typename T>
   struct tTypeVector {
     uint32_t count;
     T values[0]; // list of refs offset
   };
 
+#pragma warning(disable : 4200)
   struct tTypeDef : tTypeBuffer {
     TypeEncoding encoding;
     TypeFlags flags;
